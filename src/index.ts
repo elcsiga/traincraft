@@ -1,7 +1,7 @@
-function component(): HTMLElement {
-    const element = document.createElement('div');
-    element.innerHTML = 'Hello webpack';
-    return element;
-}
+import { Canvas } from "./canvas/canvas";
+import './index.scss';
 
-document.body.appendChild(component());
+
+
+
+document.body.appendChild(new Canvas().canvasElement);

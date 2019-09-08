@@ -9,7 +9,22 @@ module.exports = {
       {
         test: /\.ts$/,
         use: 'ts-loader',
-        exclude: /node_modules/
+        include: path.resolve(__dirname, '../../src')
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-modules-typescript-loader'},
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true
+            }
+          },
+          { loader: 'sass-loader' }
+        ],
+        include: path.resolve(__dirname, '../../src')
       }
     ]
   },
