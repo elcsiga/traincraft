@@ -1,7 +1,7 @@
-import { Canvas } from "./canvas/canvas";
+import { Canvas } from './canvas/canvas';
 import './index.scss';
 
+const canves = new Canvas();
 
-
-
-document.body.appendChild(new Canvas().canvasElement);
+document.body.appendChild(canves.canvasElement);
+canves.render();

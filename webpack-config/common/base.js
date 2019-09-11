@@ -12,10 +12,20 @@ module.exports = {
         include: path.resolve(__dirname, '../../src')
       },
       {
+        test: /\.(png|jp(e*)g|svg)$/,
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 8000, // Convert images < 8kb to base64 strings
+            name: 'images/[hash]-[name].[ext]'
+          }
+        }]
+      },
+      {
         test: /\.scss$/,
         use: [
           { loader: 'style-loader' },
-          { loader: 'css-modules-typescript-loader'},
+          { loader: 'css-modules-typescript-loader' },
           {
             loader: 'css-loader',
             options: {
@@ -29,7 +39,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: [ '.ts', '.js' ]
+    extensions: ['.ts', '.js']
   },
   plugins: [
     new CleanWebpackPlugin(),

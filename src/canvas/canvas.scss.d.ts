@@ -2,6 +2,7 @@
 // Please do not change this file!
 interface CssExports {
   'container': string;
+  'tile': string;
 }
 declare const cssExports: CssExports;
 export = cssExports;
