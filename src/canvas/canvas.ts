@@ -1,6 +1,6 @@
 import * as styles from './canvas.scss';
 import * as emptyTile from '../assets/tiles/empty.png';
-import { toView } from '../common/geo';
+import { toView, MapCoord, ViewCoord, toMap } from '../common/geo';
 
 export interface TileData {
     type: number;
@@ -9,10 +9,17 @@ export interface TileData {
 
 export class Canvas {
     canvasElement: HTMLElement;
+    hoveredElement: TileData;
 
     map: TileData[][] = [];
     mapSize = 6;
 
+    getSafeTile(m: MapCoord): TileData {
+        if (m.x >= 0 && m.y >= 0 && m.x < this.mapSize && m.y < this.mapSize) {
+            return this.map[m.x][m.y];
+        }
+        return null;
+    }
     constructor() {
         this.canvasElement = document.createElement('div');
         this.canvasElement.classList.add(styles.container);
@@ -26,6 +33,12 @@ export class Canvas {
                 };
             }
         }
+
+        this.canvasElement.addEventListener('mousemove', e => {
+            const w: ViewCoord = { wx:e.x, wy: e.y };
+            this.hover( toMap(w));
+            console.log (w, toMap(w));
+        });
     }
 
     render(): void {
@@ -36,10 +49,21 @@ export class Canvas {
                 const w = toView({ x, y });
                 img.src = emptyTile;
                 img.classList.add(styles.tile);
-                img.style.transform = `translate(${w.wx}px, ${w.wy}px) rotate(90deg)`;
+                img.style.transform = `translate(${w.wx}px, ${w.wy}px) rotate(0deg)`;
                 this.canvasElement.appendChild(img);
                 tile.element = img;
             }
+        }
+    }
+
+    hover(m: MapCoord) {
+        if (this.hoveredElement) {
+            this.hoveredElement.element.style.opacity = '1';
+        }
+        const tile = this.getSafeTile(m);
+        if (tile) {
+            tile.element.style.opacity = '.7';
+            this.hoveredElement = tile;
         }
     }
 }
