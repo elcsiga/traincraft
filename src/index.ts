@@ -1,7 +1,9 @@
-import { Canvas } from './canvas/canvas';
 import './index.scss';
+import { Canvas } from './canvas/canvas';
+import { HexMap } from './hexmap/hexmap';
 
-const canves = new Canvas();
+const map = new HexMap(5);
+const canves = new Canvas(map);
 
 document.body.appendChild(canves.canvasElement);
 canves.render();

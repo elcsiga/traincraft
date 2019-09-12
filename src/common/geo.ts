@@ -7,6 +7,17 @@ export interface ViewCoord {
     wy: number;
 }
 
+type Shift = Number; // 0-5
+export function shift(m: MapCoord, s: Shift): MapCoord {
+    switch(s) {
+        case 0: return {x: m.x - 1, y: m.y    };
+        case 1: return {x: m.x,     y: m.y - 1};
+        case 2: return {x: m.x + 1, y: m.y - 1};
+        case 3: return {x: m.x + 1, y: m.y    };
+        case 4: return {x: m.x,     y: m.y + 1};
+        case 5: return {x: m.x - 1, y: m.y + 1};
+    }
+}
 export const M3 = Math.sqrt(3) / 2;
 export const tileHeight = 60;
 export const tileWidth = tileHeight * M3;
@@ -21,7 +32,8 @@ export const toMap: (w: ViewCoord) => MapCoord = w => {
     const dy = (w.wy + (tileHeight / 2)) / (tileHeight * .75);
     const dx = (w.wx + (tileWidth / 2) - dy * tileWidth / 2) / tileWidth ;
 
-    const x = Math.floor(dx);
-    const y = Math.floor(dy);
+    const x = Math.round(dx);
+    const y = Math.round(dy);
     return { x, y };
 };
+

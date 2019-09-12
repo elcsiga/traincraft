@@ -1,6 +1,7 @@
 import * as styles from './canvas.scss';
 import * as emptyTile from '../assets/tiles/empty.png';
-import { toView, MapCoord, ViewCoord, toMap } from '../common/geo';
+import { toView, MapCoord, ViewCoord, toMap, tileWidth, tileHeight } from '../common/geo';
+import { HexMap } from '../hexmap/hexmap';
 
 export interface TileData {
     type: number;
@@ -11,45 +12,35 @@ export class Canvas {
     canvasElement: HTMLElement;
     hoveredElement: TileData;
 
-    map: TileData[][] = [];
-    mapSize = 6;
-
-    getSafeTile(m: MapCoord): TileData {
-        if (m.x >= 0 && m.y >= 0 && m.x < this.mapSize && m.y < this.mapSize) {
-            return this.map[m.x][m.y];
-        }
-        return null;
-    }
-    constructor() {
+    constructor(public map: HexMap) {
         this.canvasElement = document.createElement('div');
         this.canvasElement.classList.add(styles.container);
 
-        for (let x = 0; x < this.mapSize; x++) {
-            this.map[x] = [];
-            for (let y = 0; y < this.mapSize; y++) {
-                this.map[x][y] = {
-                    type: 0,
-                    element: null,
-                };
-            }
-        }
-
         this.canvasElement.addEventListener('mousemove', e => {
-            const w: ViewCoord = { wx:e.x, wy: e.y };
-            this.hover( toMap(w));
-            console.log (w, toMap(w));
+            const w: ViewCoord = {
+                wx: e.x - this.canvasElement.offsetWidth / 2,
+                wy: e.y - this.canvasElement.offsetHeight / 2
+            };
+            this.hover(toMap(w));
+            console.log(w, toMap(w));
         });
     }
 
     render(): void {
-        for (let x = 0; x < this.mapSize; x++) {
-            for (let y = 0; y < this.mapSize; y++) {
-                const tile = this.map[x][y];
+        const mapSize = this.map.size;
+        for (let x = -mapSize; x <= mapSize; x++) {
+            for (let y = -mapSize; y <= mapSize; y++) {
+                const m = {x, y};
+                const tile = this.map.getTile(m);
                 const img = document.createElement('img');
-                const w = toView({ x, y });
+                const w = toView( m );
                 img.src = emptyTile;
                 img.classList.add(styles.tile);
-                img.style.transform = `translate(${w.wx}px, ${w.wy}px) rotate(0deg)`;
+
+                const tx = w.wx + this.canvasElement.offsetWidth / 2 - tileWidth / 2;
+                const ty = w.wy + this.canvasElement.offsetHeight / 2 - tileHeight / 2;
+
+                img.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
                 this.canvasElement.appendChild(img);
                 tile.element = img;
             }
@@ -60,7 +51,7 @@ export class Canvas {
         if (this.hoveredElement) {
             this.hoveredElement.element.style.opacity = '1';
         }
-        const tile = this.getSafeTile(m);
+        const tile = this.map.getSafeTile(m);
         if (tile) {
             tile.element.style.opacity = '.7';
             this.hoveredElement = tile;
