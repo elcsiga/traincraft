@@ -1,7 +1,16 @@
-import { toView, MapCoord, ViewCoord, toMap } from '../common/geo';
+import { toView, MapCoord, ViewCoord, toMap } from './hexGeo';
 
-export interface TileData {
+enum TileBackground {
+    Water,
+    Ground
+}
+interface TileRail {
     type: number;
+    rotation: number;
+}
+export interface TileData {
+    background: TileBackground;
+    rail: TileRail
     element: HTMLElement;
 }
 
@@ -14,7 +23,8 @@ export class HexMap {
             this.map[x] = [];
             for (let y = 0; y < arrayLength; y++) {
                 this.map[x][y] = {
-                    type: 0,
+                    background: TileBackground.Water,
+                    rail: null,
                     element: null,
                 };
             }

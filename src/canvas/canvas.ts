@@ -1,12 +1,7 @@
 import * as styles from './canvas.scss';
 import * as emptyTile from '../assets/tiles/empty.png';
-import { toView, MapCoord, ViewCoord, toMap, tileWidth, tileHeight } from '../common/geo';
-import { HexMap } from '../hexmap/hexmap';
-
-export interface TileData {
-    type: number;
-    element: HTMLElement;
-}
+import { toView, MapCoord, ViewCoord, toMap, tileWidth, tileHeight } from '../hex/hexGeo';
+import { HexMap, TileData } from '../hex/hexmap';
 
 export class Canvas {
     canvasElement: HTMLElement;

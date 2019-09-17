@@ -1,6 +1,6 @@
 import './index.scss';
 import { Canvas } from './canvas/canvas';
-import { HexMap } from './hexmap/hexmap';
+import { HexMap } from './hex/hexmap';
 
 const map = new HexMap(5);
 const canves = new Canvas(map);
