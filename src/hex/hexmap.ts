@@ -36,7 +36,7 @@ export class HexMap {
     }
 
     getSafeTile(m: MapCoord): TileData {
-        if (m.x >= -this.size && m.y <= this.size &&
+        if (m && m.x >= -this.size && m.x <= this.size &&
             m.y <= this.size && m.y <= this.size) {
             return this.getTile(m);
         }

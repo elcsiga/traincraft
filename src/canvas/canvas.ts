@@ -7,6 +7,9 @@ export class Canvas {
     canvasElement: HTMLElement;
     hoveredElement: TileData;
 
+    width: number;
+    height: number;
+
     constructor(public map: HexMap) {
         this.canvasElement = document.createElement('div');
         this.canvasElement.classList.add(styles.container);
@@ -17,11 +20,13 @@ export class Canvas {
                 wy: e.y - this.canvasElement.offsetHeight / 2
             };
             this.hover(toMap(w));
-            console.log(w, toMap(w));
         });
     }
 
     render(): void {
+        this.width = this.canvasElement.offsetWidth;
+        this.height = this.canvasElement.offsetHeight;
+
         const mapSize = this.map.size;
         for (let x = -mapSize; x <= mapSize; x++) {
             for (let y = -mapSize; y <= mapSize; y++) {
@@ -30,10 +35,13 @@ export class Canvas {
                 const img = document.createElement('img');
                 const w = toView( m );
                 img.src = emptyTile;
+                img.width = tileWidth;
+                img.height = tileHeight;
+
                 img.classList.add(styles.tile);
 
-                const tx = w.wx + this.canvasElement.offsetWidth / 2 - tileWidth / 2;
-                const ty = w.wy + this.canvasElement.offsetHeight / 2 - tileHeight / 2;
+                const tx = w.wx + this.width / 2; // - tileWidth / 2;
+                const ty = w.wy + this.height / 2; // - tileHeight / 2;
 
                 img.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
                 this.canvasElement.appendChild(img);
