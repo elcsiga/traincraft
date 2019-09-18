@@ -16,10 +16,15 @@ export class Canvas {
         this.canvasElement.classList.add(styles.container);
 
         this.canvasElement.addEventListener('mousemove', e => {
+
+            const cx = this.width / 2 - tileWidth / 2;
+            const cy = this.height / 2 - tileHeight / 2;
+
             const w: ViewCoord = {
-                wx: e.x - this.canvasElement.offsetWidth / 2,
-                wy: e.y - this.canvasElement.offsetHeight / 2
+                wx: e.x - this.width / 2,
+                wy: this.height / 2 - e.y
             };
+
             this.hover(w);
         });
     }
@@ -29,6 +34,10 @@ export class Canvas {
         this.height = this.canvasElement.offsetHeight;
 
         const mapSize = this.map.size;
+
+        const cx = this.width / 2 - tileWidth / 2;
+        const cy = this.height / 2 - tileHeight / 2;
+
         for (let x = -mapSize; x <= mapSize; x++) {
             for (let y = -mapSize; y <= mapSize; y++) {
                 const m = {x, y};
@@ -41,8 +50,8 @@ export class Canvas {
 
                 img.classList.add(styles.tile);
 
-                const tx = w.wx + this.width / 2; // - tileWidth / 2;
-                const ty = w.wy + this.height / 2; // - tileHeight / 2;
+                const tx = cx + w.wx;
+                const ty = cy - w.wy;
 
                 img.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
                 this.canvasElement.appendChild(img);
@@ -61,17 +70,22 @@ export class Canvas {
         }
         const tile = this.map.getSafeTile(m);
         if (tile) {
-            tile.element.style.opacity = '.7';
-            this.hoveredElement = tile;
 
-            /*const neighbourDir: HexDir = getDir(m, w);
+
+            const neighbourDir: HexDir = getDir(m, w);
             if (neighbourDir) {
                 const neighBourTile = this.map.getSafeTile( shift(m, neighbourDir) );
                 if (neighBourTile) {
-                    neighBourTile.element.style.opacity = '.5';
+                    neighBourTile.element.style.opacity = '.7';
                     this.hoveredNeighbourElement = neighBourTile;
+
+                    tile.element.style.opacity = '.7';
+                    this.hoveredElement = tile;
                 }
-            }*/
+            } else {
+                tile.element.style.opacity = '.5';
+                this.hoveredElement = tile;
+            }
         }
     }
 }
