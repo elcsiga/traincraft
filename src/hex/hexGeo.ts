@@ -7,17 +7,26 @@ export interface ViewCoord {
     wy: number;
 }
 
-type Shift = Number; // 0-5
-export function shift(m: MapCoord, s: Shift): MapCoord {
-    switch (s) {
-        case 0: return { x: m.x - 1, y: m.y };
-        case 1: return { x: m.x, y: m.y - 1 };
-        case 2: return { x: m.x + 1, y: m.y - 1 };
-        case 3: return { x: m.x + 1, y: m.y };
-        case 4: return { x: m.x, y: m.y + 1 };
-        case 5: return { x: m.x - 1, y: m.y + 1 };
+export type HexDir = number; // 1 - 6
+
+export const Shifts: MapCoord[] = [
+    { x: 0, y : 0 }, // 0
+    { x: 1, y : 0 }, // 1 - right
+    { x: 1, y : -1 }, // 2
+    { x: 0, y : -1 }, // 3
+    { x: -1, y : 0 }, // 4
+    { x: -1, y : 1 }, // 5
+    { x: 0, y : 1 }  // 6
+]
+
+export function shift(m: MapCoord, dir: HexDir) {
+    const d = Shifts[ dir ];
+    return {
+        x: m.x + d.x,
+        y: m.y + d.y
     }
 }
+
 export const M3 = Math.sqrt(3) / 2;
 export const tileHeight = 100;
 export const tileWidth = tileHeight * M3;
@@ -42,16 +51,13 @@ export const toMap: (w: ViewCoord) => MapCoord = w => {
     const x2 = w.wx / (tileWidth * .5);
     const y3i = Math.floor(y3);
 
-    let x, y;
+    let y = y3i / 3;
     switch (y3i % 3) {
         case 0:
-            y = y3i / 3;
-            x = Math.round(x2 / 2 - y / 2);
             break;
         case -1:
         case 2:
-            y = Math.floor(y3i / 3) + 1;
-            x = Math.round(x2 / 2 - y / 2);
+            y += 1;
             break;
         case -2:
         case 1:
@@ -61,18 +67,28 @@ export const toMap: (w: ViewCoord) => MapCoord = w => {
             if (dx > 1) dx -= 2;
             dx = Math.abs(x2);
             const dy = y3-y3i;
-            if (x2 > 0) {
-                const a = dy / dx;
-                console.log('a', a>1);
+
+            console.log( dx,dy, dx / dy)
+            if ( dy / dx > 1) {
+                y += 1;
             }
-
-            //y = Math.floor(y3i / 3) + 1;
-            //x = Math.round(x2 / 2 - y / 2);
-
             break;
-
     }
+    const x = Math.round(x2 / 2 - y / 2);
+    return { x, y };
+}
 
-    //return {x: 0, y: 0};
-    return x !== undefined && x !== undefined ? { x, y } : null;
+export const getDir: (m: MapCoord, w: ViewCoord) => HexDir = (m,w) => {
+    const center = toView(m);
+    const dx = w.wx - center.wx;
+    const dy = w.wy - center.wy;
+
+    const r2 = tileHeight / 4; // half radius
+    if (dx*dx + dy*dy > r2 * r2) {
+        const a = Math.atan2(dy, dx) * 180 / Math.PI;
+        return Math.round(a / 60) + 1;
+    }
+    else {
+        return 0;
+    }
 }

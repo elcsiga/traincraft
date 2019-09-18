@@ -1,11 +1,12 @@
 import * as styles from './canvas.scss';
 import * as emptyTile from '../assets/tiles/empty.png';
-import { toView, MapCoord, ViewCoord, toMap, tileWidth, tileHeight } from '../hex/hexGeo';
+import { toView, MapCoord, ViewCoord, toMap, tileWidth, tileHeight, getDir, HexDir, shift } from '../hex/hexGeo';
 import { HexMap, TileData } from '../hex/hexmap';
 
 export class Canvas {
     canvasElement: HTMLElement;
     hoveredElement: TileData;
+    hoveredNeighbourElement: TileData;
 
     width: number;
     height: number;
@@ -19,7 +20,7 @@ export class Canvas {
                 wx: e.x - this.canvasElement.offsetWidth / 2,
                 wy: e.y - this.canvasElement.offsetHeight / 2
             };
-            this.hover(toMap(w));
+            this.hover(w);
         });
     }
 
@@ -50,14 +51,27 @@ export class Canvas {
         }
     }
 
-    hover(m: MapCoord) {
+    hover(w: ViewCoord) {
+        const m = toMap(w);
         if (this.hoveredElement) {
             this.hoveredElement.element.style.opacity = '1';
+        }
+        if (this.hoveredNeighbourElement) {
+            this.hoveredNeighbourElement.element.style.opacity = '1';
         }
         const tile = this.map.getSafeTile(m);
         if (tile) {
             tile.element.style.opacity = '.7';
             this.hoveredElement = tile;
+
+            const neighbourDir: HexDir = getDir(m, w);
+            if (neighbourDir) {
+                const neighBourTile = this.map.getSafeTile( shift(m, neighbourDir) );
+                if (neighBourTile) {
+                    neighBourTile.element.style.opacity = '.5';
+                    this.hoveredNeighbourElement = tile;
+                }
+            }
         }
     }
 }
