@@ -7,7 +7,7 @@ export interface ViewCoord {
     wy: number;
 }
 
-export type HexDir = number; // 1 - 6
+export type HexDir = number;
 
 export const Shifts: MapCoord[] = [
     { x: 0, y : 0 }, // 0
@@ -19,13 +19,21 @@ export const Shifts: MapCoord[] = [
     { x: 1, y : -1 }, // 6
 ]
 
-export function shift(m: MapCoord, dir: HexDir) {
+export function shift(m: MapCoord, dir: HexDir): MapCoord {
     const d = Shifts[ dir ];
 
     return {
         x: m.x + d.x,
         y: m.y + d.y
     }
+}
+
+export function opposite(d: HexDir): HexDir {
+    return normalize(d-3);
+}
+
+export function normalize(d: HexDir): HexDir {
+    return d < 1 ? d + 6 : d;
 }
 
 export const M3 = Math.sqrt(3) / 2;
@@ -76,9 +84,9 @@ export const getDir: (m: MapCoord, w: ViewCoord) => HexDir = (m,w) => {
     if (dx*dx + dy*dy > r2 * r2) {
         const a = Math.atan2(dy, dx) * 180 / Math.PI;
         const d = Math.round(a / 60);
-        return d >= 0 ? d + 1 : d + 7;
+        return normalize(d + 1);
     }
     else {
-        return 0;
+        return null;
     }
 }
