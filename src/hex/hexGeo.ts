@@ -51,7 +51,7 @@ export const toMap: (w: ViewCoord) => MapCoord = w => {
     const x2 = w.wx / (tileWidth * .5);
     const y3i = Math.floor(y3);
 
-    let y = y3i / 3;
+    let y = Math.floor(y3i / 3);
     switch (y3i % 3) {
         case 0:
             break;
@@ -64,11 +64,14 @@ export const toMap: (w: ViewCoord) => MapCoord = w => {
             const x1 = x2 / 2;
             const x1i = Math.floor(x1);
             let dx = (x1-x1i) * 2;
-            if (dx > 1) dx -= 2;
-            dx = Math.abs(x2);
+            if (dx > 1) {
+                dx = dx - 2;
+            }
+            dx = Math.abs(dx);
             const dy = y3-y3i;
 
-            console.log( dx,dy, dx / dy)
+            console.log( x1, x1i, (x1-x1i) * 2, dx);
+
             if ( dy / dx > 1) {
                 y += 1;
             }

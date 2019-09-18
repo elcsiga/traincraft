@@ -64,14 +64,14 @@ export class Canvas {
             tile.element.style.opacity = '.7';
             this.hoveredElement = tile;
 
-            const neighbourDir: HexDir = getDir(m, w);
+            /*const neighbourDir: HexDir = getDir(m, w);
             if (neighbourDir) {
                 const neighBourTile = this.map.getSafeTile( shift(m, neighbourDir) );
                 if (neighBourTile) {
                     neighBourTile.element.style.opacity = '.5';
-                    this.hoveredNeighbourElement = tile;
+                    this.hoveredNeighbourElement = neighBourTile;
                 }
-            }
+            }*/
         }
     }
 }
