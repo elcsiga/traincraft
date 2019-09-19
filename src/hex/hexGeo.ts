@@ -80,13 +80,8 @@ export const getDir: (m: MapCoord, w: ViewCoord) => HexDir = (m,w) => {
     const dx = w.wx - center.wx;
     const dy = w.wy - center.wy;
 
-    const r2 = tileHeight / 4; // half radius
-    if (dx*dx + dy*dy > r2 * r2) {
-        const a = Math.atan2(dy, dx) * 180 / Math.PI;
-        const d = Math.round(a / 60);
-        return normalize(d + 1);
-    }
-    else {
-        return null;
-    }
+    const a = Math.atan2(dy, dx) * 180 / Math.PI;
+    const d = Math.round(a / 60);
+    return normalize(d + 1);
+
 }

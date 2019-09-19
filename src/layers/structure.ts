@@ -1,3 +1,6 @@
+import { Layer } from "./shared";
+import { Tile } from "../hex/hexmap";
+
 //////////////////////
 //
 // The structure layer
@@ -93,4 +96,11 @@ export function render(
         return;
     }
 
+}
+
+export class StructureLayer extends Layer{
+
+    render(tile: Tile): HTMLElement {
+        return null;
+    }
 }
