@@ -10,18 +10,18 @@ export class EditTerrain extends UiState {
         super();
     }
 
-    private resetElements() {
+    resetHover() {
         if (this.hoveredElement) {
             this.hoveredElement.element.style.opacity = '1';
         }
     };
 
     release() {
-        this.resetElements();
+        this.resetHover();
     }
     hover(w: ViewCoord) {
         const m = toMap(w);
-        this.resetElements();
+        this.resetHover();
 
         const tile = this.map.getSafeTile(m);
         if (tile) {

@@ -18,7 +18,7 @@ const canvas = new Canvas(map, laywers);
 
 canvas.setUiState( new EditTerrain(map) );
 
-document.body.appendChild(canvas.canvasElement);
+document.body.appendChild(canvas.getElement());
 canvas.render();
 
 document.addEventListener('keypress', e => {

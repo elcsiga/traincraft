@@ -11,7 +11,7 @@ export class BuildRail extends UiState {
         super();
     }
 
-    private resetElements() {
+    resetHover() {
         if (this.hoveredElement) {
             this.hoveredElement.element.style.opacity = '1';
         }
@@ -21,12 +21,12 @@ export class BuildRail extends UiState {
     };
 
     release() {
-        this.resetElements();
+        this.resetHover();
     }
 
     hover(w: ViewCoord) {
         const m = toMap(w);
-        this.resetElements();
+        this.resetHover();
         const tile = this.map.getSafeTile(m);
         if (tile) {
             const neighbourDir: HexDir = getDir(m, w);
