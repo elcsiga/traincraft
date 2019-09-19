@@ -1,12 +1,12 @@
 import * as styles from './canvas.scss';
 import * as emptyTile from '../assets/tiles/empty.png';
 import { toView, MapCoord, ViewCoord, toMap, tileWidth, tileHeight, getDir, HexDir, shift } from '../hex/hexGeo';
-import { HexMap, TileData } from '../hex/hexmap';
+import { HexMap, Tile } from '../hex/hexmap';
 
 export class Canvas {
     canvasElement: HTMLElement;
-    hoveredElement: TileData;
-    hoveredNeighbourElement: TileData;
+    hoveredElement: Tile;
+    hoveredNeighbourElement: Tile;
 
     width: number;
     height: number;

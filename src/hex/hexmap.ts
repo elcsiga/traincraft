@@ -1,21 +1,13 @@
 import { toView, MapCoord, ViewCoord, toMap } from './hexGeo';
+import { StructureDef } from '../layers/structure';
 
-enum TileBackground {
-    Water,
-    Ground
-}
-interface TileRail {
-    type: number;
-    rotation: number;
-}
-export interface TileData {
-    background: TileBackground;
-    rail: TileRail
+export interface Tile {
+    struxture: StructureDef;
     element: HTMLElement;
 }
 
 export class HexMap {
-    private map: TileData[][] = [];
+    private map: Tile[][] = [];
 
     constructor(public size = 2) {
         const arrayLength = this.size * 2 + 1;
@@ -23,19 +15,18 @@ export class HexMap {
             this.map[x] = [];
             for (let y = 0; y < arrayLength; y++) {
                 this.map[x][y] = {
-                    background: TileBackground.Water,
-                    rail: null,
+                    struxture: null,
                     element: null,
                 };
             }
         }
     }
 
-    getTile(m: MapCoord): TileData {
+    getTile(m: MapCoord): Tile {
         return this.map[m.x + this.size][m.y + this.size];
     }
 
-    getSafeTile(m: MapCoord): TileData {
+    getSafeTile(m: MapCoord): Tile {
         if (m && m.x >= -this.size && m.x <= this.size &&
             m.y <= this.size && m.y <= this.size) {
             return this.getTile(m);
