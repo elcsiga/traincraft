@@ -1,7 +1,7 @@
 import * as styles from './canvas.scss';
-import * as emptyTile from '../assets/tiles/empty.png';
 import { toView, MapCoord, ViewCoord, toMap, tileWidth, tileHeight, getDir, HexDir, shift } from '../hex/hexGeo';
 import { HexMap, Tile } from '../hex/hexmap';
+import { Terrain } from '../layers/terrain';
 
 export class Canvas {
     canvasElement: HTMLElement;
@@ -41,21 +41,20 @@ export class Canvas {
         for (let x = -mapSize; x <= mapSize; x++) {
             for (let y = -mapSize; y <= mapSize; y++) {
                 const m = {x, y};
-                const tile = this.map.getTile(m);
-                const img = document.createElement('img');
                 const w = toView( m );
-                img.src = emptyTile;
-                img.width = tileWidth;
-                img.height = tileHeight;
+                const tile = this.map.getTile(m);
 
-                img.classList.add(styles.tile);
+                const div = document.createElement('div');
+                div.classList.add(styles.tile);
 
                 const tx = cx + w.wx;
                 const ty = cy - w.wy;
+                div.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
 
-                img.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
-                this.canvasElement.appendChild(img);
-                tile.element = img;
+                div.appendChild(Terrain.render());
+
+                this.canvasElement.appendChild(div);
+                tile.element = div;
             }
         }
     }
