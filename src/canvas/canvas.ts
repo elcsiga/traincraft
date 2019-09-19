@@ -29,6 +29,7 @@ export class Canvas {
         this.containerElement.addEventListener('mousedown', this.handleMouseDown);
         this.containerElement.addEventListener('mouseup', this.handleMouseUp);
         this.containerElement.addEventListener('click', this.handleClick);
+        this.containerElement.addEventListener('mouseleave', this.handleMouseLeave);
     }
 
     getElement() { return this.containerElement; }
@@ -40,6 +41,7 @@ export class Canvas {
         this.containerElement.removeEventListener('mousedown', this.handleMouseDown);
         this.containerElement.removeEventListener('mouseup', this.handleMouseUp);
         this.containerElement.removeEventListener('click', this.handleClick);
+        this.containerElement.removeEventListener('mouseleave', this.handleMouseLeave);
 
         this.containerElement.remove();
     }
@@ -89,6 +91,11 @@ export class Canvas {
         }
     }
 
+    private handleMouseLeave = (e: MouseEvent) => {
+        this.uiState.resetHover();
+        this.panStartPos = null;
+    }
+
     private getViewCoord(e: MouseEvent) {
         return {
             wx: e.x - this.width / 2 - this.viewOffset.wx,
@@ -103,8 +110,8 @@ export class Canvas {
     }
 
     render(): void {
-        this.width = this.canvasElement.offsetWidth;
-        this.height = this.canvasElement.offsetHeight;
+        this.width = this.containerElement.offsetWidth;
+        this.height = this.containerElement.offsetHeight;
 
         const mapSize = this.map.size;
 
