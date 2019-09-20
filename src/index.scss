@@ -1,4 +1,13 @@
 :global(body), :global(html) {
     height: 100%;
     margin: 0;
+    padding: 0;
+}
+
+.demoCanvas {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    bottom: 30px;
+    right: 30px;
 }

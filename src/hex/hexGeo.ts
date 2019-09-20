@@ -37,7 +37,7 @@ export function normalize(d: HexDir): HexDir {
 }
 
 export const M3 = Math.sqrt(3) / 2;
-export const tileHeight = 300;
+export const tileHeight = 100;
 export const tileWidth = tileHeight * M3;
 
 export const toView: (m: MapCoord) => ViewCoord = m => {
