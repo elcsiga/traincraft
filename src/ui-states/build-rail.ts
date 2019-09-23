@@ -1,9 +1,8 @@
-import { UiState } from "./shared";
-import { Tile, HexMap } from "../hex/hexmap";
-import { ViewCoord, toMap, HexDir, getDir, shift } from "../hex/hexGeo";
+import { UiState } from './shared';
+import { Tile, HexMap } from '../hex/hexmap';
+import { ViewCoord, toMap, HexDir, getDir, shift } from '../hex/hexGeo';
 
 export class BuildRail extends UiState {
-
     hoveredElement: Tile;
     hoveredNeighbourElement: Tile;
 
@@ -18,13 +17,13 @@ export class BuildRail extends UiState {
         if (this.hoveredNeighbourElement) {
             this.hoveredNeighbourElement.element.style.opacity = '1';
         }
-    };
+    }
 
     release() {
         this.resetHover();
     }
 
-    hover(w: ViewCoord) {
+    hover(w: ViewCoord): void {
         const m = toMap(w);
         this.resetHover();
         const tile = this.map.getSafeTile(m);
@@ -40,7 +39,7 @@ export class BuildRail extends UiState {
         }
     }
 
-    click() {
-
+    click(): void {
+        // TODO
     }
 }

@@ -1,25 +1,24 @@
-import { UiState } from "./shared";
-import { Tile, HexMap } from "../hex/hexmap";
-import { toMap, ViewCoord } from "../hex/hexGeo";
+import { UiState } from './shared';
+import { Tile, HexMap } from '../hex/hexmap';
+import { toMap, ViewCoord } from '../hex/hexGeo';
 
 export class EditTerrain extends UiState {
-
     hoveredElement: Tile;
 
     constructor(private map: HexMap) {
         super();
     }
 
-    resetHover() {
+    resetHover(): void {
         if (this.hoveredElement) {
             this.hoveredElement.element.style.opacity = '1';
         }
-    };
+    }
 
-    release() {
+    release(): void {
         this.resetHover();
     }
-    hover(w: ViewCoord) {
+    hover(w: ViewCoord): void {
         const m = toMap(w);
         this.resetHover();
 
@@ -30,7 +29,7 @@ export class EditTerrain extends UiState {
         }
     }
 
-    click(w: ViewCoord) {
-
+    click(w: ViewCoord): void {
+        // TODO
     }
 }
