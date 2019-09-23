@@ -46,15 +46,6 @@ export const toView: (m: MapCoord) => ViewCoord = m => {
     return { wx, wy };
 };
 
-export const toMap2: (w: ViewCoord) => MapCoord = w => {
-    const dy = (w.wy + tileHeight / 2) / (tileHeight * 0.75);
-    const dx = (w.wx + tileWidth / 2 - (dy * tileWidth) / 2) / tileWidth;
-
-    const x = Math.round(dx);
-    const y = Math.round(dy);
-    return { x, y };
-};
-
 export const toMap: (w: ViewCoord) => MapCoord = w => {
     const y3 = w.wy / (tileHeight * 0.25); // creating 3 horizotal zones
     const y3i = Math.floor(y3);
@@ -65,7 +56,7 @@ export const toMap: (w: ViewCoord) => MapCoord = w => {
         case 1:
             // the 1. horizontal zone of the sloped sides...
             const dy = 1 - (y3 - y3i); //
-            const x1i = Math.round(x1);
+            const x1i = y%2 != 0 ? Math.floor(x1) + .5 : Math.round(x1);
             const dx = Math.abs((x1 - x1i) * 2);
             if (dx > dy) {
                 y++; // over the sloped edges: belongs to the upper tile
