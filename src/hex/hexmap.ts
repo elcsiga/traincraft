@@ -1,8 +1,10 @@
 import { MapCoord } from './hexGeo';
 import { StructureDef } from '../layers/structure';
+import { TerrainDef } from '../layers/terrain/terrain';
 
 export interface Tile {
     struxture: StructureDef;
+    terrain: TerrainDef;
     element: HTMLElement;
 }
 
@@ -15,6 +17,7 @@ export class HexMap {
             this.map[x] = [];
             for (let y = 0; y < arrayLength; y++) {
                 this.map[x][y] = {
+                    terrain: { type: Math.random() > 0.5 ? 'empty': 'water'},
                     struxture: null,
                     element: null,
                 };

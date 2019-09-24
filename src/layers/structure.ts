@@ -102,7 +102,7 @@ export function render(previousDefdef: StructureDef, newDef: StructureDef) {
 }
 
 export class StructureLayer extends Layer {
-    render(tile: Tile): HTMLElement {
-        return null;
+    render(tile: Tile) {
+
     }
 }

@@ -190,15 +190,12 @@ export class Canvas {
                 const ty = cy - w.wy;
                 div.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
 
-                this.layers.forEach(layer => {
-                    const e = layer.render(tile);
-                    if (e) {
-                        div.appendChild(e);
-                    }
-                });
-
                 this.canvasElement.appendChild(div);
                 tile.element = div;
+
+                this.layers.forEach(layer => {
+                    layer.render(tile);
+                });
             }
         }
     }

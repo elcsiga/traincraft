@@ -4,7 +4,7 @@ import { HexMap } from './hex/hexmap';
 import { EditTerrain } from './ui-states/edit-terrain';
 import { BuildRail } from './ui-states/build-rail';
 import { Layer } from './layers/shared';
-import { Terrain } from './layers/terrain';
+import { Terrain } from './layers/terrain/terrain';
 import { StructureLayer } from './layers/structure';
 
 const map = new HexMap(2);
