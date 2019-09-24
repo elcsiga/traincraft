@@ -2,7 +2,7 @@ import * as styles from './canvas.scss';
 import { toView, ViewCoord, tileWidth, tileHeight } from '../hex/hexGeo';
 import { HexMap } from '../hex/hexmap';
 import { UiState } from '../ui-states/shared';
-import { Layer } from '../layers/shared';
+import { Layer } from '../layers/layer';
 
 interface EventPos {
     clientX: number;
@@ -131,7 +131,7 @@ export class Canvas {
         },
     ];
 
-    private handleResize = () => {
+    private handleResize: () => void = () => {
         this.updateContainer();
     };
 
@@ -151,11 +151,11 @@ export class Canvas {
         };
     }
 
-    private getViewCoord(e: EventPos) {
+    private getViewCoord(e: EventPos): ViewCoord {
         return this.screenToView(this.toScreen(e));
     }
 
-    private updateContainer() {
+    private updateContainer(): void {
         this.width = this.containerElement.offsetWidth;
         this.height = this.containerElement.offsetHeight;
         const rect = this.containerElement.getBoundingClientRect();
@@ -164,7 +164,7 @@ export class Canvas {
         this.updateTransform();
     }
 
-    private updateTransform() {
+    private updateTransform(): void {
         const tx = this.viewOffset.sx;
         const ty = -this.viewOffset.sy;
         const z = this.zoom;
@@ -194,13 +194,13 @@ export class Canvas {
                 tile.element = div;
 
                 this.layers.forEach(layer => {
-                    layer.render(tile);
+                    layer.enter(tile);
                 });
             }
         }
     }
 
-    setUiState(state: UiState) {
+    setUiState(state: UiState): void {
         if (this.uiState) {
             this.uiState.release();
         }

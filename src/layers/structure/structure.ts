@@ -1,5 +1,5 @@
-import { Layer } from './shared';
-import { Tile } from '../hex/hexmap';
+import { Layer } from '../layer';
+import { Tile } from '../../hex/hexmap';
 
 //////////////////////
 //
@@ -24,7 +24,7 @@ const structureTypes: StructureType[] = [
         name: 'empty',
         connections: '______',
         rotations: 1,
-        next: p => null,
+        next: () => null,
     },
     {
         name: 'straight',
@@ -42,7 +42,7 @@ const structureTypes: StructureType[] = [
         connections: 'R_____',
         name: 'end',
         rotations: 6,
-        next: p => null,
+        next: () => null,
     },
     {
         name: 'switchRight',
@@ -95,14 +95,17 @@ export function toConnections(tileDef: StructureDef): string {
     return c3x.substring(tileDef.rotation, tileDef.rotation + 6);
 }
 
-export function render(previousDefdef: StructureDef, newDef: StructureDef) {
-    if (newDef === previousDefdef) {
-        return;
-    }
-}
-
 export class StructureLayer extends Layer {
-    render(tile: Tile) {
-
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    enter(tile: Tile): void {
+        // TODO
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    update(tile: Tile): void {
+        // TODO
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    exit(tile: Tile): void {
+        // TODO
     }
 }

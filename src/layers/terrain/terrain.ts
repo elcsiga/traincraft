@@ -1,22 +1,25 @@
 import * as emptyTile from './assets/empty.png';
 import * as waterTile from './assets/water.png';
 import { tileWidth, tileHeight } from '../../hex/hexGeo';
-import { Layer } from '../shared';
+import { Layer } from '../layer';
 import { Tile } from '../../hex/hexmap';
 
+export type TerrainType = 'empty' | 'water';
 export interface TerrainDef {
-    type: 'empty' | 'water';
-    _element ?: HTMLImageElement;
+    type: TerrainType;
+    _element?: HTMLImageElement;
 }
 
-export class Terrain extends Layer {
-    getBackgroundImage(tile: Tile) {
+export class TerrainLayer extends Layer {
+    getBackgroundImage(tile: Tile): string {
         switch (tile.terrain.type) {
-            case 'empty': return emptyTile;
-            case 'water': return waterTile;
+            case 'empty':
+                return emptyTile;
+            case 'water':
+                return waterTile;
         }
     }
-    render(tile: Tile) {
+    enter(tile: Tile): void {
         const img = document.createElement('img');
         img.width = tileWidth;
         img.height = tileHeight;
@@ -25,8 +28,11 @@ export class Terrain extends Layer {
 
         this.update(tile);
     }
-    update(tile: Tile) {
+    update(tile: Tile): void {
         tile.terrain._element.src = this.getBackgroundImage(tile);
     }
-
+    exit(tile: Tile): void {
+        tile.terrain._element.remove();
+        delete tile.terrain._element;
+    }
 }

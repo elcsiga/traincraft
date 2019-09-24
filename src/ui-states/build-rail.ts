@@ -10,7 +10,7 @@ export class BuildRail extends UiState {
         super();
     }
 
-    resetHover() {
+    resetHover(): void {
         if (this.hoveredElement) {
             this.hoveredElement.element.style.opacity = '1';
         }
@@ -19,7 +19,7 @@ export class BuildRail extends UiState {
         }
     }
 
-    release() {
+    release(): void {
         this.resetHover();
     }
 

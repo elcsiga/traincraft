@@ -1,11 +1,12 @@
 import { UiState } from './shared';
 import { Tile, HexMap } from '../hex/hexmap';
 import { toMap, ViewCoord } from '../hex/hexGeo';
+import { TerrainType, TerrainLayer } from '../layers/terrain/terrain';
 
 export class EditTerrain extends UiState {
     hoveredElement: Tile;
 
-    constructor(private map: HexMap) {
+    constructor(private map: HexMap, private layer: TerrainLayer, private type: TerrainType) {
         super();
     }
 
@@ -29,7 +30,10 @@ export class EditTerrain extends UiState {
         }
     }
 
-    click(w: ViewCoord): void {
-        // TODO
+    click(): void {
+        if (this.hoveredElement) {
+            this.hoveredElement.terrain.type = this.type;
+            this.layer.update(this.hoveredElement);
+        }
     }
 }

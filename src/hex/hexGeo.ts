@@ -56,7 +56,7 @@ export const toMap: (w: ViewCoord) => MapCoord = w => {
         case 1:
             // the 1. horizontal zone of the sloped sides...
             const dy = 1 - (y3 - y3i); //
-            const x1i = y%2 != 0 ? Math.floor(x1) + .5 : Math.round(x1);
+            const x1i = y % 2 != 0 ? Math.floor(x1) + 0.5 : Math.round(x1);
             const dx = Math.abs((x1 - x1i) * 2);
             if (dx > dy) {
                 y++; // over the sloped edges: belongs to the upper tile

@@ -3,16 +3,19 @@ import { Canvas } from './canvas/canvas';
 import { HexMap } from './hex/hexmap';
 import { EditTerrain } from './ui-states/edit-terrain';
 import { BuildRail } from './ui-states/build-rail';
-import { Layer } from './layers/shared';
-import { Terrain } from './layers/terrain/terrain';
-import { StructureLayer } from './layers/structure';
+import { Layer } from './layers/layer';
+import { TerrainLayer } from './layers/terrain/terrain';
+import { StructureLayer } from './layers/structure/structure';
 
 const map = new HexMap(2);
 
-const laywers: Layer[] = [new Terrain(), new StructureLayer()];
+const terrainLayer = new TerrainLayer();
+const structureLayer = new StructureLayer();
+
+const laywers: Layer[] = [terrainLayer, structureLayer];
 const canvas = new Canvas(map, laywers);
 
-canvas.setUiState(new EditTerrain(map));
+canvas.setUiState(new EditTerrain(map, terrainLayer, 'water'));
 
 const demoCanvas = document.createElement('div');
 demoCanvas.classList.add(styles.demoCanvas);
@@ -23,6 +26,7 @@ canvas.init();
 canvas.render();
 
 document.addEventListener('keypress', e => {
-    if (e.key == '1') canvas.setUiState(new EditTerrain(map));
-    if (e.key == '2') canvas.setUiState(new BuildRail(map));
+    if (e.key == '1') canvas.setUiState(new EditTerrain(map, terrainLayer, 'empty'));
+    if (e.key == '2') canvas.setUiState(new EditTerrain(map, terrainLayer, 'water'));
+    if (e.key == '3') canvas.setUiState(new BuildRail(map));
 });
