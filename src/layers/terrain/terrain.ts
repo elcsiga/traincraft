@@ -7,7 +7,7 @@ import { Tile } from '../../hex/hexmap';
 export type TerrainType = 'empty' | 'water';
 export interface TerrainDef {
     type: TerrainType;
-    _element?: HTMLImageElement;
+    _element: HTMLImageElement;
 }
 
 export class TerrainLayer extends Layer {

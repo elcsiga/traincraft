@@ -19,7 +19,10 @@ export class HexMap {
             this.map[x] = [];
             for (let y = 0; y < arrayLength; y++) {
                 this.map[x][y] = {
-                    terrain: { type: Math.random() > 0.5 ? 'empty' : 'water' },
+                    terrain: {
+                        type: Math.random() > 0.5 ? 'empty' : 'water',
+                        _element: null
+                    },
                     struxture: null,
                     _element: null,
                     _renderPhase: null,
