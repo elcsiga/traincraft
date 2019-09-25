@@ -7,7 +7,7 @@ import { Layer } from './layers/layer';
 import { TerrainLayer } from './layers/terrain/terrain';
 import { StructureLayer } from './layers/structure/structure';
 
-const map = new HexMap(2);
+const map = new HexMap(100);
 
 const terrainLayer = new TerrainLayer();
 const structureLayer = new StructureLayer();

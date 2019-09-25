@@ -41,4 +41,9 @@ export class HexMap {
         }
         return null;
     }
+
+    getSafeVisibleTile(m: MapCoord): Tile {
+        const tile = this.getSafeTile(m);
+        return tile && tile._element ? tile : null;
+    }
 }

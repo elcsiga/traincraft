@@ -11,10 +11,10 @@ export class BuildRail extends UiState {
     }
 
     resetHover(): void {
-        if (this.hoveredElement) {
+        if (this.hoveredElement && this.hoveredElement._element) {
             this.hoveredElement._element.style.opacity = '1';
         }
-        if (this.hoveredNeighbourElement) {
+        if (this.hoveredNeighbourElement && this.hoveredNeighbourElement._element) {
             this.hoveredNeighbourElement._element.style.opacity = '1';
         }
     }
@@ -26,10 +26,10 @@ export class BuildRail extends UiState {
     hover(w: ViewCoord): void {
         const m = toMap(w);
         this.resetHover();
-        const tile = this.map.getSafeTile(m);
+        const tile = this.map.getSafeVisibleTile(m);
         if (tile) {
             const neighbourDir: HexDir = getDir(m, w);
-            const neighBourTile = this.map.getSafeTile(shift(m, neighbourDir));
+            const neighBourTile = this.map.getSafeVisibleTile(shift(m, neighbourDir));
             if (neighBourTile) {
                 neighBourTile._element.style.opacity = '.7';
                 this.hoveredNeighbourElement = neighBourTile;

@@ -82,8 +82,10 @@ export const getDir: (m: MapCoord, w: ViewCoord) => HexDir = (m, w) => {
 };
 
 export function forachAreaCoord( area: MapArea, f: (p: MapCoord) => void): void {
-    for (let y = area.tl.y; y <= area.br.y; y++) {
-        for (let x = area.tl.x; x<= area.br.x; x++) {
+    for (let y = area.br.y; y <= area.tl.y; y++) {
+        const tlOffset = Math.floor((area.tl.y-y) / 2);
+        const brOffset = Math.floor((y-area.br.y) / 2);
+        for (let x = area.tl.x + tlOffset; x<= area.br.x - brOffset; x++) {
             f({x,y});
         }
     }

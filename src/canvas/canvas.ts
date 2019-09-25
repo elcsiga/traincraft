@@ -56,8 +56,8 @@ export class Canvas {
 
     getArea(): MapArea {
         return {
-            tl: toMap(this.screenToView({ sx: 0, sy: 0 })),
-            br: toMap(this.screenToView({ sx: this.width, sy: this.height }))
+            tl: toMap(this.screenToView({ sx: -this.width / 2, sy: this.height / 2 })),
+            br: toMap(this.screenToView({ sx: this.width / 2, sy: -this.height / 2 }))
         };
     }
 
@@ -110,6 +110,8 @@ export class Canvas {
             handler: (e: MouseEvent) => {
                 if (e.button === 1) {
                     this.panBase = null;
+                    
+                    this.render();                                       
 
                     const w = this.getViewCoord(e);
                     this.lastHoveredPosition = w;
@@ -138,8 +140,9 @@ export class Canvas {
         {
             key: 'wheel',
             handler: (e: WheelEvent) => {
-                this.zoom = Math.max(0.3, Math.min(3, this.zoom * (e.deltaY < 0 ? 1.2 : 0.8)));
+                this.zoom = Math.max(0.5, Math.min(2, this.zoom * (e.deltaY < 0 ? 1.2 : 0.8)));
                 this.updateTransform();
+                this.render();
             },
         },
     ];
@@ -185,8 +188,6 @@ export class Canvas {
     }
 
     render(): void {
-        this.renderPhase = this.renderPhase === 1 ? 2 : 1;
-
         const area = this.getArea();
         forachAreaCoord( this.getArea(), m => {
             const tile = this.map.getSafeTile(m);
@@ -200,12 +201,15 @@ export class Canvas {
 
         if (this.previousMapArea) {
             forachAreaCoord( this.previousMapArea, m => {
-                const tile = this.map.getSafeTile(m);
+                const tile = this.map.getSafeVisibleTile(m);
                 if (tile && tile._renderPhase !== this.renderPhase) {
                     this.exit(tile, m);
                 }
             });
         }
+
+        this.renderPhase = this.renderPhase === 1 ? 2 : 1;
+        this.previousMapArea = area;
     }
 
     enter(tile: Tile, m: MapCoord) {
@@ -236,35 +240,6 @@ export class Canvas {
         tile._element.remove();
         tile._element = null;
     }
-
-    // render(): void {
-    //     const mapSize = this.map.size;
-
-    //     const cx = this.width / 2 - tileWidth / 2;
-    //     const cy = this.height / 2 - tileHeight / 2;
-
-    //     for (let x = -mapSize; x <= mapSize; x++) {
-    //         for (let y = -mapSize; y <= mapSize; y++) {
-    //             const m = { x, y };
-    //             const w = toView(m);
-    //             const tile = this.map.getTile(m);
-
-    //             const div = document.createElement('div');
-    //             div.classList.add(styles.tile);
-
-    //             const tx = cx + w.wx;
-    //             const ty = cy - w.wy;
-    //             div.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
-
-    //             this.canvasElement.appendChild(div);
-    //             tile.element = div;
-
-    //             this.layers.forEach(layer => {
-    //                 layer.enter(tile);
-    //             });
-    //         }
-    //     }
-    // }
 
     setUiState(state: UiState): void {
         if (this.uiState) {
