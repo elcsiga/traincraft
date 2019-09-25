@@ -7,6 +7,11 @@ export interface ViewCoord {
     wy: number;
 }
 
+export interface MapArea {
+    tl: MapCoord,
+    br: MapCoord
+}
+
 export type HexDir = number;
 
 export const Shifts: MapCoord[] = [
@@ -75,3 +80,11 @@ export const getDir: (m: MapCoord, w: ViewCoord) => HexDir = (m, w) => {
     const d = Math.round(a / 60);
     return normalize(d + 1);
 };
+
+export function forachAreaCoord( area: MapArea, f: (p: MapCoord) => void): void {
+    for (let y = area.tl.y; y <= area.br.y; y++) {
+        for (let x = area.tl.x; x<= area.br.x; x++) {
+            f({x,y});
+        }
+    }
+}

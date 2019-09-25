@@ -1,6 +1,6 @@
 import * as styles from './canvas.scss';
-import { toView, ViewCoord, tileWidth, tileHeight } from '../hex/hexGeo';
-import { HexMap } from '../hex/hexmap';
+import { toView, ViewCoord, tileWidth, tileHeight, toMap, MapCoord, MapArea, forachAreaCoord } from '../hex/hexGeo';
+import { HexMap, Tile } from '../hex/hexmap';
 import { UiState } from '../ui-states/shared';
 import { Layer } from '../layers/layer';
 
@@ -12,6 +12,8 @@ interface ScreenCoord {
     sx: number;
     sy: number;
 }
+export type RnderPhase = 1 | 2;
+
 export class Canvas {
     containerElement: HTMLElement;
     canvasElement: HTMLElement;
@@ -29,7 +31,11 @@ export class Canvas {
     viewOffset: ScreenCoord = { sx: 0, sy: 0 };
     zoom = 1;
 
+    renderPhase: RnderPhase = 1;
+
     lastMousePos: EventPos = null;
+
+    previousMapArea: MapArea = null;
 
     constructor(private map: HexMap, private layers: Layer[]) {
         this.canvasElement = document.createElement('div');
@@ -46,6 +52,13 @@ export class Canvas {
     }
     getElement(): HTMLElement {
         return this.containerElement;
+    }
+
+    getArea(): MapArea {
+        return {
+            tl: toMap(this.screenToView({ sx: 0, sy: 0 })),
+            br: toMap(this.screenToView({ sx: this.width, sy: this.height }))
+        };
     }
 
     release(): void {
@@ -172,33 +185,86 @@ export class Canvas {
     }
 
     render(): void {
-        const mapSize = this.map.size;
+        this.renderPhase = this.renderPhase === 1 ? 2 : 1;
 
+        const area = this.getArea();
+        forachAreaCoord( this.getArea(), m => {
+            const tile = this.map.getSafeTile(m);
+            if (tile) {
+                if (!tile._element) {
+                    this.enter(tile, m);
+                }
+                tile._renderPhase = this.renderPhase;
+            }
+        });
+
+        if (this.previousMapArea) {
+            forachAreaCoord( this.previousMapArea, m => {
+                const tile = this.map.getSafeTile(m);
+                if (tile && tile._renderPhase !== this.renderPhase) {
+                    this.exit(tile, m);
+                }
+            });
+        }
+    }
+
+    enter(tile: Tile, m: MapCoord) {
+        const w = toView(m);
+        const div = document.createElement('div');
+        div.classList.add(styles.tile);
+
+        //TODO
         const cx = this.width / 2 - tileWidth / 2;
         const cy = this.height / 2 - tileHeight / 2;
 
-        for (let x = -mapSize; x <= mapSize; x++) {
-            for (let y = -mapSize; y <= mapSize; y++) {
-                const m = { x, y };
-                const w = toView(m);
-                const tile = this.map.getTile(m);
+        const tx = cx + w.wx;
+        const ty = cy - w.wy;
+        div.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
 
-                const div = document.createElement('div');
-                div.classList.add(styles.tile);
+        this.canvasElement.appendChild(div);
+        tile._element = div;
 
-                const tx = cx + w.wx;
-                const ty = cy - w.wy;
-                div.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
-
-                this.canvasElement.appendChild(div);
-                tile.element = div;
-
-                this.layers.forEach(layer => {
-                    layer.enter(tile);
-                });
-            }
-        }
+        this.layers.forEach(layer => {
+            layer.enter(tile);
+        });
     }
+
+    exit(tile: Tile, m: MapCoord) {
+        this.layers.forEach(layer => {
+            layer.exit(tile);
+        });
+        tile._element.remove();
+        tile._element = null;
+    }
+
+    // render(): void {
+    //     const mapSize = this.map.size;
+
+    //     const cx = this.width / 2 - tileWidth / 2;
+    //     const cy = this.height / 2 - tileHeight / 2;
+
+    //     for (let x = -mapSize; x <= mapSize; x++) {
+    //         for (let y = -mapSize; y <= mapSize; y++) {
+    //             const m = { x, y };
+    //             const w = toView(m);
+    //             const tile = this.map.getTile(m);
+
+    //             const div = document.createElement('div');
+    //             div.classList.add(styles.tile);
+
+    //             const tx = cx + w.wx;
+    //             const ty = cy - w.wy;
+    //             div.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
+
+    //             this.canvasElement.appendChild(div);
+    //             tile.element = div;
+
+    //             this.layers.forEach(layer => {
+    //                 layer.enter(tile);
+    //             });
+    //         }
+    //     }
+    // }
 
     setUiState(state: UiState): void {
         if (this.uiState) {

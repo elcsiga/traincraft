@@ -1,11 +1,13 @@
 import { MapCoord } from './hexGeo';
-import { StructureDef } from '../layers/structure';
+import { StructureDef } from '../layers/structure/structure';
 import { TerrainDef } from '../layers/terrain/terrain';
+import { RnderPhase } from '../canvas/canvas';
 
 export interface Tile {
     struxture: StructureDef;
     terrain: TerrainDef;
-    element: HTMLElement;
+    _element: HTMLElement;
+    _renderPhase: RnderPhase;
 }
 
 export class HexMap {
@@ -19,7 +21,8 @@ export class HexMap {
                 this.map[x][y] = {
                     terrain: { type: Math.random() > 0.5 ? 'empty' : 'water' },
                     struxture: null,
-                    element: null,
+                    _element: null,
+                    _renderPhase: null,
                 };
             }
         }

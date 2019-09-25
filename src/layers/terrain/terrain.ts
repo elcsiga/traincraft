@@ -24,7 +24,7 @@ export class TerrainLayer extends Layer {
         img.width = tileWidth;
         img.height = tileHeight;
         tile.terrain._element = img;
-        tile.element.appendChild(img);
+        tile._element.appendChild(img);
 
         this.update(tile);
     }

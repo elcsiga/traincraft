@@ -12,10 +12,10 @@ export class BuildRail extends UiState {
 
     resetHover(): void {
         if (this.hoveredElement) {
-            this.hoveredElement.element.style.opacity = '1';
+            this.hoveredElement._element.style.opacity = '1';
         }
         if (this.hoveredNeighbourElement) {
-            this.hoveredNeighbourElement.element.style.opacity = '1';
+            this.hoveredNeighbourElement._element.style.opacity = '1';
         }
     }
 
@@ -31,9 +31,9 @@ export class BuildRail extends UiState {
             const neighbourDir: HexDir = getDir(m, w);
             const neighBourTile = this.map.getSafeTile(shift(m, neighbourDir));
             if (neighBourTile) {
-                neighBourTile.element.style.opacity = '.7';
+                neighBourTile._element.style.opacity = '.7';
                 this.hoveredNeighbourElement = neighBourTile;
-                tile.element.style.opacity = '.7';
+                tile._element.style.opacity = '.7';
                 this.hoveredElement = tile;
             }
         }

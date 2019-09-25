@@ -12,7 +12,7 @@ export class EditTerrain extends UiState {
 
     resetHover(): void {
         if (this.hoveredElement) {
-            this.hoveredElement.element.style.opacity = '1';
+            this.hoveredElement._element.style.opacity = '1';
         }
     }
 
@@ -25,7 +25,7 @@ export class EditTerrain extends UiState {
 
         const tile = this.map.getSafeTile(m);
         if (tile) {
-            tile.element.style.opacity = '.5';
+            tile._element.style.opacity = '.5';
             this.hoveredElement = tile;
         }
     }
