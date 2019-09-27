@@ -31,9 +31,9 @@ const laywers: Layer[] = [terrainLayer, structureLayer];
 const canvas = new Canvas(map, laywers);
 
 const uiStates = [
-    new EditTerrain(map, canvas, terrainLayer, 'empty'),
-    new EditTerrain(map, canvas, terrainLayer, 'water'),
-    new BuildRail(map, canvas),
+    new EditTerrain(canvas, terrainLayer, 'empty'),
+    new EditTerrain(canvas, terrainLayer, 'water'),
+    new BuildRail(canvas, structureLayer),
 ];
 canvas.setUiState(uiStates[0]);
 

@@ -12,10 +12,9 @@ export interface MapArea {
     br: MapCoord;
 }
 
-export type HexDir = number;
+export type HexDir = number; // 0..5
 
 export const Shifts: MapCoord[] = [
-    { x: 0, y: 0 }, // 0
     { x: 1, y: 0 }, // 1 - right
     { x: 0, y: 1 }, // 2
     { x: -1, y: 1 }, // 3
@@ -34,7 +33,7 @@ export function shift(m: MapCoord, dir: HexDir): MapCoord {
 }
 
 export function normalize(d: HexDir): HexDir {
-    return d < 1 ? d + 6 : d;
+    return d < 0 ? d + 6 : d;
 }
 
 export function opposite(d: HexDir): HexDir {
@@ -78,7 +77,7 @@ export const getDir: (m: MapCoord, w: ViewCoord) => HexDir = (m, w) => {
 
     const a = (Math.atan2(dy, dx) * 180) / Math.PI;
     const d = Math.round(a / 60);
-    return normalize(d + 1);
+    return normalize(d);
 };
 
 export function forachAreaCoord(area: MapArea, f: (p: MapCoord) => void): void {

@@ -4,7 +4,15 @@ import { tileWidth, tileHeight } from '../../hex/hexGeo';
 import { Layer } from '../layer';
 import { VisibleTile } from '../../canvas/canvas';
 
+//////////////////////
+//
+// The terrain layer
+//
+//////////////////////
+
 export type TerrainType = 'empty' | 'water';
+type Tile = VisibleTile & TileWithTerrain;
+
 export interface TerrainDef {
     type: TerrainType;
     _element: HTMLImageElement;
@@ -23,20 +31,24 @@ export class TerrainLayer extends Layer {
                 return waterTile;
         }
     }
-    enter(tile: TileWithTerrain & VisibleTile): void {
-        const img = document.createElement('img');
-        img.width = tileWidth;
-        img.height = tileHeight;
-        tile.terrain._element = img;
-        tile.canvas._element.appendChild(img);
+    enter(tile: Tile): void {
+        if (tile.terrain) {
+            const img = document.createElement('img');
+            img.width = tileWidth;
+            img.height = tileHeight;
+            tile.terrain._element = img;
+            tile.canvas._element.appendChild(img);
 
-        this.update(tile);
+            this.update(tile);
+        }
     }
-    update(tile: TileWithTerrain & VisibleTile): void {
+    update(tile: Tile): void {
         tile.terrain._element.src = this.getBackgroundImage(tile);
     }
-    exit(tile: TileWithTerrain & VisibleTile): void {
-        tile.terrain._element.remove();
-        tile.terrain._element = null;
+    exit(tile: Tile): void {
+        if (tile.terrain) {
+            tile.terrain._element.remove();
+            tile.terrain._element = null;
+        }
     }
 }

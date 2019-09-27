@@ -1,25 +1,19 @@
 import { UiState } from './shared';
-import { TileMap } from '../hex/tileMap';
 import { toMap, ViewCoord } from '../hex/hexGeo';
 import { TerrainType, TerrainLayer, TileWithTerrain } from '../layers/terrain/terrain';
 import { VisibleTile, Canvas } from '../canvas/canvas';
 
 type Tile = VisibleTile & TileWithTerrain;
 export class EditTerrain extends UiState {
-    hoveredElement: Tile;
+    cursorTile: Tile;
 
-    constructor(
-        private map: TileMap<Tile>,
-        private canvas: Canvas,
-        private layer: TerrainLayer,
-        private type: TerrainType,
-    ) {
+    constructor(private canvas: Canvas, private layer: TerrainLayer, private type: TerrainType) {
         super();
     }
 
     resetHover(): void {
-        if (this.hoveredElement && this.hoveredElement.canvas) {
-            this.hoveredElement.canvas._element.style.opacity = '1';
+        if (this.cursorTile && this.cursorTile.canvas) {
+            this.cursorTile.canvas._element.style.opacity = '1';
         }
     }
 
@@ -38,14 +32,14 @@ export class EditTerrain extends UiState {
         const tile = this.canvas.getSafeVisibleTile(m);
         if (tile) {
             tile.canvas._element.style.opacity = '.5';
-            this.hoveredElement = tile as Tile;
+            this.cursorTile = tile as Tile;
         }
     }
 
     click(): void {
-        if (this.hoveredElement) {
-            this.hoveredElement.terrain.type = this.type;
-            this.layer.update(this.hoveredElement);
+        if (this.cursorTile && this.cursorTile.terrain) {
+            this.cursorTile.terrain.type = this.type;
+            this.layer.update(this.cursorTile);
         }
     }
 }
