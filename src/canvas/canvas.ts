@@ -11,10 +11,6 @@ export interface VisibleTile {
     };
 }
 
-interface EventPos {
-    clientX: number;
-    clientY: number;
-}
 interface ScreenCoord {
     sx: number;
     sy: number;
@@ -30,13 +26,17 @@ export class Canvas {
     private top: number;
     private left: number;
 
-    private uiState: UiState = null;
     private lastHoveredPosition: ViewCoord = null;
+
+    private uiState: UiState = null;
     private panBase: { mousePos: ScreenCoord; offset: ScreenCoord } = null;
+
     private viewOffset: ScreenCoord = { sx: 0, sy: 0 };
     private zoom = 1;
+
     private renderPhase: RnderPhase = 1;
     private previousMapArea: MapArea = null;
+
     private lastMousePos: ScreenCoord = null;
 
     constructor(private map: TileMap<VisibleTile>, private layers: Layer[]) {
@@ -55,7 +55,7 @@ export class Canvas {
     }
 
     release(): void {
-        this.uiState.release();
+        this.uiState.disable();
 
         this.eventHandlers.forEach(e => this.containerElement.removeEventListener(e.key, e.handler));
         document.removeEventListener('resize', this.handleResize);
@@ -72,24 +72,43 @@ export class Canvas {
         return tile && tile.canvas ? tile : null;
     }
 
+    // hover
+
+    private hover(e: MouseEvent): void {
+        const w = this.screenToView(this.getMousePos(e));
+        this.lastHoveredPosition = w;
+        this.uiState.hover(w);
+    }
+
+    private resetHover(): void {
+        this.uiState.resetHover();
+        this.lastHoveredPosition = null;
+    }
+
+    // area
+
     getAreaOffset(): ScreenCoord {
         return {
             sx: tileWidth * this.zoom,
-            sy: tileHeight * this.zoom
+            sy: tileHeight * this.zoom,
         };
     }
 
     getArea(): MapArea {
         const areaOffset = this.getAreaOffset();
         return {
-            tl: toMap(this.screenToView({
-                sx: -this.width / 2 - areaOffset.sx,
-                sy: this.height / 2 + areaOffset.sy
-            })),
-            br: toMap(this.screenToView({
-                sx: this.width / 2 + areaOffset.sx,
-                sy: -this.height / 2 - areaOffset.sy
-            })),
+            tl: toMap(
+                this.screenToView({
+                    sx: -this.width / 2 - areaOffset.sx,
+                    sy: this.height / 2 + areaOffset.sy,
+                }),
+            ),
+            br: toMap(
+                this.screenToView({
+                    sx: this.width / 2 + areaOffset.sx,
+                    sy: -this.height / 2 - areaOffset.sy,
+                }),
+            ),
         };
     }
 
@@ -99,7 +118,7 @@ export class Canvas {
             handler: (e: MouseEvent) => {
                 if (this.panBase) {
                     const from = this.panBase.mousePos;
-                    const to = this.toScreen(e);
+                    const to = this.getMousePos(e);
 
                     const dx = to.sx - from.sx;
                     const dy = to.sy - from.sy;
@@ -111,33 +130,29 @@ export class Canvas {
                     this.updateTransform();
 
                     const areaOffset = this.getAreaOffset();
-                    if (Math.abs(dx) > areaOffset.sx
-                        || Math.abs(dy) > areaOffset.sy) {
+                    if (Math.abs(dx) > areaOffset.sx || Math.abs(dy) > areaOffset.sy) {
                         this.panBase.offset = this.viewOffset;
-                        this.panBase.mousePos = this.toScreen(e);
+                        this.panBase.mousePos = this.getMousePos(e);
                         this.render();
                     }
                 } else {
-                    const w = this.getViewCoord(e);
-                    this.lastHoveredPosition = w;
-                    this.uiState.hover(w);
+                    this.hover(e);
                 }
-                this.lastMousePos = this.toScreen(e);
+                this.lastMousePos = this.getMousePos(e);
             },
         },
         {
             key: 'mousedown',
             handler: (e: MouseEvent) => {
                 if (e.button === 1) {
-                    this.uiState.resetHover();
-                    this.lastHoveredPosition = null;
+                    this.resetHover();
                     this.panBase = {
-                        mousePos: this.toScreen(e),
+                        mousePos: this.getMousePos(e),
                         offset: this.viewOffset,
                     };
-                    this.containerElement.style.cursor = "all-scroll";
+                    this.containerElement.style.cursor = 'all-scroll';
                 }
-                this.lastMousePos = this.toScreen(e);
+                this.lastMousePos = this.getMousePos(e);
             },
         },
         {
@@ -145,27 +160,21 @@ export class Canvas {
             handler: (e: MouseEvent) => {
                 if (e.button === 1) {
                     this.panBase = null;
-
                     this.render();
-
-                    const w = this.getViewCoord(e);
-                    this.lastHoveredPosition = w;
-                    this.uiState.hover(w);
-
-                    this.containerElement.style.cursor = "auto";
+                    this.hover(e);
+                    this.containerElement.style.cursor = 'auto';
                 }
-                this.lastMousePos = this.toScreen(e);
-
+                this.lastMousePos = this.getMousePos(e);
             },
         },
         {
             key: 'click',
             handler: (e: MouseEvent) => {
                 if (e.button === 0) {
-                    const w = this.getViewCoord(e);
+                    const w = this.screenToView(this.getMousePos(e));
                     this.uiState.click(w);
                 }
-                this.lastMousePos = this.toScreen(e);
+                this.lastMousePos = this.getMousePos(e);
             },
         },
         {
@@ -174,13 +183,12 @@ export class Canvas {
                 this.uiState.resetHover();
                 this.panBase = null;
                 this.lastMousePos = null;
-                this.containerElement.style.cursor = "auto";
+                this.containerElement.style.cursor = 'auto';
             },
         },
         {
             key: 'wheel',
             handler: (e: WheelEvent) => {
-
                 if (this.lastMousePos) {
                     const w = this.screenToView(this.lastMousePos);
                     this.zoom = Math.max(0.3, Math.min(2, this.zoom * (e.deltaY < 0 ? 1.2 : 0.8)));
@@ -192,7 +200,6 @@ export class Canvas {
                     this.updateTransform();
                     this.render();
                 }
-
             },
         },
     ];
@@ -203,7 +210,7 @@ export class Canvas {
 
     /////////////
 
-    private toScreen(e: EventPos): ScreenCoord {
+    private getMousePos(e: MouseEvent): ScreenCoord {
         return {
             sx: e.clientX - this.left - this.width / 2,
             sy: this.height / 2 + this.top - e.clientY,
@@ -217,15 +224,11 @@ export class Canvas {
         };
     }
 
-    private viewToScreen(w: ViewCoord):ScreenCoord  {
+    private viewToScreen(w: ViewCoord): ScreenCoord {
         return {
             sx: w.wx * this.zoom + this.viewOffset.sx,
-            sy: w.wy * this.zoom + this.viewOffset.sy
+            sy: w.wy * this.zoom + this.viewOffset.sy,
         };
-    }
-
-    private getViewCoord(e: EventPos): ViewCoord {
-        return this.screenToView(this.toScreen(e));
     }
 
     private updateContainer(): void {
@@ -287,8 +290,8 @@ export class Canvas {
         this.canvasElement.appendChild(div);
         tile.canvas = {
             _element: div,
-            _renderPhase: this.renderPhase
-        }
+            _renderPhase: this.renderPhase,
+        };
 
         this.layers.forEach(layer => {
             layer.enter(tile, m);
@@ -305,9 +308,12 @@ export class Canvas {
 
     setUiState(state: UiState): void {
         if (this.uiState) {
-            this.uiState.release();
+            this.uiState.resetHover();
+            this.uiState.disable();
         }
         this.uiState = state;
+        this.uiState.enable();
+
         if (this.lastHoveredPosition) {
             state.hover(this.lastHoveredPosition);
         }

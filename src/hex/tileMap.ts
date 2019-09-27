@@ -19,7 +19,7 @@ export class TileMap<T> {
             for (let y = 0; y < arrayLength; y++) {
                 this.map[x][y] = f({
                     x: x - this.size,
-                    y: y - this.size
+                    y: y - this.size,
                 });
             }
         }

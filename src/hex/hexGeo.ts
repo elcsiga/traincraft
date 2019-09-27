@@ -1,5 +1,3 @@
-import { fsync } from "fs";
-
 export interface MapCoord {
     x: number;
     y: number;
@@ -93,11 +91,11 @@ export function forachAreaCoord(area: MapArea, f: (p: MapCoord) => void): void {
     }
 }
 
-export function distance( f: MapCoord ): number {
+export function distance(f: MapCoord): number {
     const e = f.x * f.y;
-    if (e >= 0){
+    if (e >= 0) {
         return Math.abs(f.x + f.y);
     } else {
-        return Math.max( Math.abs(f.x), Math.abs(f.y) );
+        return Math.max(Math.abs(f.x), Math.abs(f.y));
     }
 }

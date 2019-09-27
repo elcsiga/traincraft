@@ -21,8 +21,12 @@ export class BuildRail extends UiState {
         }
     }
 
-    release(): void {
-        this.resetHover();
+    enable(): void {
+        // enabled
+    }
+
+    disable(): void {
+        // disabled
     }
 
     hover(w: ViewCoord): void {

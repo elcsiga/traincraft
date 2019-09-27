@@ -23,9 +23,14 @@ export class EditTerrain extends UiState {
         }
     }
 
-    release(): void {
-        this.resetHover();
+    enable(): void {
+        // enabled
     }
+
+    disable(): void {
+        // disabled
+    }
+
     hover(w: ViewCoord): void {
         const m = toMap(w);
         this.resetHover();
