@@ -1,17 +1,19 @@
 import * as styles from './index.scss';
 import { Canvas, VisibleTile } from './canvas/canvas';
-import { HexMap } from './hex/hexmap';
+import { TileMap } from './hex/tileMap';
 import { EditTerrain } from './ui-states/edit-terrain';
 import { BuildRail } from './ui-states/build-rail';
 import { Layer } from './layers/layer';
 import { TerrainLayer, TileWithTerrain } from './layers/terrain/terrain';
 import { StructureLayer, TileWithStructure } from './layers/structure/structure';
+import { distance } from './hex/hexGeo';
 
+const MAP_SIZE = 10;
 type TrainCraftTile = VisibleTile & TileWithTerrain & TileWithStructure;
-const map = new HexMap<TrainCraftTile>(100);
-map.create(() => ({
+const map = new TileMap<TrainCraftTile>(MAP_SIZE);
+map.create( m => distance(m) > MAP_SIZE ? null : ({
     terrain: {
-        type: Math.random() > 0.5 ? 'empty' : 'water',
+        type: 'empty' ,
         _element: null,
     },
     structure: null,
@@ -37,7 +39,6 @@ demoCanvas.appendChild(canvas.getElement());
 
 document.body.appendChild(demoCanvas);
 canvas.init();
-canvas.render();
 
 document.addEventListener('keypress', e => {
     if (e.key == '1') canvas.setUiState(uiStates[0]);

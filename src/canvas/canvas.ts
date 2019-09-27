@@ -1,6 +1,6 @@
 import * as styles from './canvas.scss';
 import { toView, ViewCoord, tileWidth, tileHeight, toMap, MapCoord, MapArea, forachAreaCoord } from '../hex/hexGeo';
-import { HexMap } from '../hex/hexmap';
+import { TileMap } from '../hex/tileMap';
 import { UiState } from '../ui-states/shared';
 import { Layer } from '../layers/layer';
 
@@ -22,29 +22,24 @@ interface ScreenCoord {
 export type RnderPhase = 1 | 2;
 
 export class Canvas {
-    containerElement: HTMLElement;
-    canvasElement: HTMLElement;
+    private containerElement: HTMLElement;
+    private canvasElement: HTMLElement;
 
-    width: number;
-    height: number;
-    top: number;
-    left: number;
+    private width: number;
+    private height: number;
+    private top: number;
+    private left: number;
 
-    uiState: UiState = null;
-    lastHoveredPosition: ViewCoord = null;
+    private uiState: UiState = null;
+    private lastHoveredPosition: ViewCoord = null;
+    private panBase: { mousePos: ScreenCoord; offset: ScreenCoord } = null;
+    private viewOffset: ScreenCoord = { sx: 0, sy: 0 };
+    private zoom = 1;
+    private renderPhase: RnderPhase = 1;
+    private previousMapArea: MapArea = null;
+    private lastMousePos: ScreenCoord = null;
 
-    panBase: { eventPos: EventPos; offset: ScreenCoord } = null;
-
-    viewOffset: ScreenCoord = { sx: 0, sy: 0 };
-    zoom = 1;
-
-    renderPhase: RnderPhase = 1;
-
-    lastMousePos: EventPos = null;
-
-    previousMapArea: MapArea = null;
-
-    constructor(private map: HexMap<VisibleTile>, private layers: Layer[]) {
+    constructor(private map: TileMap<VisibleTile>, private layers: Layer[]) {
         this.canvasElement = document.createElement('div');
         this.canvasElement.classList.add(styles.canvas);
         this.containerElement = document.createElement('div');
@@ -52,25 +47,11 @@ export class Canvas {
         this.containerElement.appendChild(this.canvasElement);
 
         this.eventHandlers.forEach(e => this.containerElement.addEventListener(e.key, e.handler));
+        document.addEventListener('resize', this.handleResize);
     }
 
     init(): void {
         this.updateContainer();
-    }
-    getElement(): HTMLElement {
-        return this.containerElement;
-    }
-
-    getSafeVisibleTile(m: MapCoord): VisibleTile {
-        const tile = this.map.getSafeTile(m);
-        return tile && tile.canvas ? tile : null;
-    }
-
-    getArea(): MapArea {
-        return {
-            tl: toMap(this.screenToView({ sx: -this.width / 2, sy: this.height / 2 })),
-            br: toMap(this.screenToView({ sx: this.width / 2, sy: -this.height / 2 })),
-        };
     }
 
     release(): void {
@@ -82,25 +63,66 @@ export class Canvas {
         this.containerElement.remove();
     }
 
+    getElement(): HTMLElement {
+        return this.containerElement;
+    }
+
+    getSafeVisibleTile(m: MapCoord): VisibleTile {
+        const tile = this.map.getSafeTile(m);
+        return tile && tile.canvas ? tile : null;
+    }
+
+    getAreaOffset(): ScreenCoord {
+        return {
+            sx: tileWidth * this.zoom,
+            sy: tileHeight * this.zoom
+        };
+    }
+
+    getArea(): MapArea {
+        const areaOffset = this.getAreaOffset();
+        return {
+            tl: toMap(this.screenToView({
+                sx: -this.width / 2 - areaOffset.sx,
+                sy: this.height / 2 + areaOffset.sy
+            })),
+            br: toMap(this.screenToView({
+                sx: this.width / 2 + areaOffset.sx,
+                sy: -this.height / 2 - areaOffset.sy
+            })),
+        };
+    }
+
     eventHandlers: { key: string; handler: EventListener }[] = [
         {
             key: 'mousemove',
             handler: (e: MouseEvent) => {
                 if (this.panBase) {
-                    const from = this.toScreen(this.panBase.eventPos);
+                    const from = this.panBase.mousePos;
                     const to = this.toScreen(e);
 
+                    const dx = to.sx - from.sx;
+                    const dy = to.sy - from.sy;
+
                     this.viewOffset = {
-                        sx: this.panBase.offset.sx + to.sx - from.sx,
-                        sy: this.panBase.offset.sy + to.sy - from.sy,
+                        sx: this.panBase.offset.sx + dx,
+                        sy: this.panBase.offset.sy + dy,
                     };
                     this.updateTransform();
+
+                    const areaOffset = this.getAreaOffset();
+                    if (Math.abs(dx) > areaOffset.sx
+                        || Math.abs(dy) > areaOffset.sy) {
+                        this.panBase.offset = this.viewOffset;
+                        this.panBase.mousePos = this.toScreen(e);
+                        this.render();
+                    }
                 } else {
                     const w = this.getViewCoord(e);
                     this.lastHoveredPosition = w;
                     this.uiState.hover(w);
                 }
-                this.lastMousePos = e;
+                this.lastMousePos = this.toScreen(e);
             },
         },
         {
@@ -110,11 +132,12 @@ export class Canvas {
                     this.uiState.resetHover();
                     this.lastHoveredPosition = null;
                     this.panBase = {
-                        eventPos: e,
+                        mousePos: this.toScreen(e),
                         offset: this.viewOffset,
                     };
+                    this.containerElement.style.cursor = "all-scroll";
                 }
-                this.lastMousePos = e;
+                this.lastMousePos = this.toScreen(e);
             },
         },
         {
@@ -128,8 +151,11 @@ export class Canvas {
                     const w = this.getViewCoord(e);
                     this.lastHoveredPosition = w;
                     this.uiState.hover(w);
+
+                    this.containerElement.style.cursor = "auto";
                 }
-                this.lastMousePos = e;
+                this.lastMousePos = this.toScreen(e);
+
             },
         },
         {
@@ -139,6 +165,7 @@ export class Canvas {
                     const w = this.getViewCoord(e);
                     this.uiState.click(w);
                 }
+                this.lastMousePos = this.toScreen(e);
             },
         },
         {
@@ -147,14 +174,25 @@ export class Canvas {
                 this.uiState.resetHover();
                 this.panBase = null;
                 this.lastMousePos = null;
+                this.containerElement.style.cursor = "auto";
             },
         },
         {
             key: 'wheel',
             handler: (e: WheelEvent) => {
-                this.zoom = Math.max(0.5, Math.min(2, this.zoom * (e.deltaY < 0 ? 1.2 : 0.8)));
-                this.updateTransform();
-                this.render();
+
+                if (this.lastMousePos) {
+                    const w = this.screenToView(this.lastMousePos);
+                    this.zoom = Math.max(0.3, Math.min(2, this.zoom * (e.deltaY < 0 ? 1.2 : 0.8)));
+                    const newScreenPos = this.viewToScreen(w);
+
+                    this.viewOffset.sx -= newScreenPos.sx - this.lastMousePos.sx;
+                    this.viewOffset.sy -= newScreenPos.sy - this.lastMousePos.sy;
+
+                    this.updateTransform();
+                    this.render();
+                }
+
             },
         },
     ];
@@ -179,6 +217,13 @@ export class Canvas {
         };
     }
 
+    private viewToScreen(w: ViewCoord):ScreenCoord  {
+        return {
+            sx: w.wx * this.zoom + this.viewOffset.sx,
+            sy: w.wy * this.zoom + this.viewOffset.sy
+        };
+    }
+
     private getViewCoord(e: EventPos): ViewCoord {
         return this.screenToView(this.toScreen(e));
     }
@@ -190,6 +235,7 @@ export class Canvas {
         this.top = rect.top;
         this.left = rect.left;
         this.updateTransform();
+        this.render();
     }
 
     private updateTransform(): void {

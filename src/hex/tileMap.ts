@@ -1,6 +1,6 @@
 import { MapCoord } from './hexGeo';
 
-export class HexMap<T> {
+export class TileMap<T> {
     private map: T[][] = [];
 
     constructor(public size = 2) {
@@ -13,11 +13,14 @@ export class HexMap<T> {
         }
     }
 
-    create(f: (x: number, y: number) => T): void {
+    create(f: (m: MapCoord) => T): void {
         const arrayLength = this.size * 2 + 1;
         for (let x = 0; x < arrayLength; x++) {
             for (let y = 0; y < arrayLength; y++) {
-                this.map[x][y] = f(x, y);
+                this.map[x][y] = f({
+                    x: x - this.size,
+                    y: y - this.size
+                });
             }
         }
     }

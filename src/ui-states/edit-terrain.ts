@@ -1,5 +1,5 @@
 import { UiState } from './shared';
-import { HexMap } from '../hex/hexmap';
+import { TileMap } from '../hex/tileMap';
 import { toMap, ViewCoord } from '../hex/hexGeo';
 import { TerrainType, TerrainLayer, TileWithTerrain } from '../layers/terrain/terrain';
 import { VisibleTile, Canvas } from '../canvas/canvas';
@@ -9,7 +9,7 @@ export class EditTerrain extends UiState {
     hoveredElement: Tile;
 
     constructor(
-        private map: HexMap<Tile>,
+        private map: TileMap<Tile>,
         private canvas: Canvas,
         private layer: TerrainLayer,
         private type: TerrainType,

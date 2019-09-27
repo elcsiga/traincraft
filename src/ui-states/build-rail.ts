@@ -1,5 +1,5 @@
 import { UiState } from './shared';
-import { HexMap } from '../hex/hexmap';
+import { TileMap } from '../hex/tileMap';
 import { ViewCoord, toMap, HexDir, getDir, shift } from '../hex/hexGeo';
 import { VisibleTile, Canvas } from '../canvas/canvas';
 import { TileWithStructure } from '../layers/structure/structure';
@@ -8,7 +8,7 @@ export class BuildRail extends UiState {
     hoveredElement: VisibleTile;
     hoveredNeighbourElement: VisibleTile;
 
-    constructor(private map: HexMap<VisibleTile & TileWithStructure>, private canvas: Canvas) {
+    constructor(private map: TileMap<VisibleTile & TileWithStructure>, private canvas: Canvas) {
         super();
     }
 
