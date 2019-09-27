@@ -1,5 +1,5 @@
 import { Layer } from '../layer';
-import { Tile } from '../../hex/hexmap';
+import { VisibleTile } from '../../canvas/canvas';
 
 //////////////////////
 //
@@ -18,7 +18,9 @@ export interface StructureDef {
     typeIndex: number;
     rotation: number;
 }
-
+export interface TileWithStructure {
+    structure: StructureDef;
+}
 const structureTypes: StructureType[] = [
     {
         name: 'empty',
@@ -97,15 +99,15 @@ export function toConnections(tileDef: StructureDef): string {
 
 export class StructureLayer extends Layer {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    enter(tile: Tile): void {
+    enter(tile: VisibleTile): void {
         // TODO
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    update(tile: Tile): void {
+    update(tile: VisibleTile): void {
         // TODO
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    exit(tile: Tile): void {
+    exit(tile: VisibleTile): void {
         // TODO
     }
 }

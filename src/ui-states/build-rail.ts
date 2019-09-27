@@ -1,21 +1,23 @@
 import { UiState } from './shared';
-import { Tile, HexMap } from '../hex/hexmap';
+import { HexMap } from '../hex/hexmap';
 import { ViewCoord, toMap, HexDir, getDir, shift } from '../hex/hexGeo';
+import { VisibleTile, Canvas } from '../canvas/canvas';
+import { TileWithStructure } from '../layers/structure/structure';
 
 export class BuildRail extends UiState {
-    hoveredElement: Tile;
-    hoveredNeighbourElement: Tile;
+    hoveredElement: VisibleTile;
+    hoveredNeighbourElement: VisibleTile;
 
-    constructor(private map: HexMap) {
+    constructor(private map: HexMap<VisibleTile & TileWithStructure>, private canvas: Canvas) {
         super();
     }
 
     resetHover(): void {
-        if (this.hoveredElement && this.hoveredElement._element) {
-            this.hoveredElement._element.style.opacity = '1';
+        if (this.hoveredElement && this.hoveredElement.canvas) {
+            this.hoveredElement.canvas._element.style.opacity = '1';
         }
-        if (this.hoveredNeighbourElement && this.hoveredNeighbourElement._element) {
-            this.hoveredNeighbourElement._element.style.opacity = '1';
+        if (this.hoveredNeighbourElement && this.hoveredNeighbourElement.canvas) {
+            this.hoveredNeighbourElement.canvas._element.style.opacity = '1';
         }
     }
 
@@ -26,14 +28,14 @@ export class BuildRail extends UiState {
     hover(w: ViewCoord): void {
         const m = toMap(w);
         this.resetHover();
-        const tile = this.map.getSafeVisibleTile(m);
+        const tile = this.canvas.getSafeVisibleTile(m);
         if (tile) {
             const neighbourDir: HexDir = getDir(m, w);
-            const neighBourTile = this.map.getSafeVisibleTile(shift(m, neighbourDir));
+            const neighBourTile = this.canvas.getSafeVisibleTile(shift(m, neighbourDir));
             if (neighBourTile) {
-                neighBourTile._element.style.opacity = '.7';
+                neighBourTile.canvas._element.style.opacity = '.7';
                 this.hoveredNeighbourElement = neighBourTile;
-                tile._element.style.opacity = '.7';
+                tile.canvas._element.style.opacity = '.7';
                 this.hoveredElement = tile;
             }
         }

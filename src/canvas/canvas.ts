@@ -1,8 +1,15 @@
 import * as styles from './canvas.scss';
 import { toView, ViewCoord, tileWidth, tileHeight, toMap, MapCoord, MapArea, forachAreaCoord } from '../hex/hexGeo';
-import { HexMap, Tile } from '../hex/hexmap';
+import { HexMap } from '../hex/hexmap';
 import { UiState } from '../ui-states/shared';
 import { Layer } from '../layers/layer';
+
+export interface VisibleTile {
+    canvas: {
+        _element: HTMLElement;
+        _renderPhase: RnderPhase;
+    };
+}
 
 interface EventPos {
     clientX: number;
@@ -37,7 +44,7 @@ export class Canvas {
 
     previousMapArea: MapArea = null;
 
-    constructor(private map: HexMap, private layers: Layer[]) {
+    constructor(private map: HexMap<VisibleTile>, private layers: Layer[]) {
         this.canvasElement = document.createElement('div');
         this.canvasElement.classList.add(styles.canvas);
         this.containerElement = document.createElement('div');
@@ -54,10 +61,15 @@ export class Canvas {
         return this.containerElement;
     }
 
+    getSafeVisibleTile(m: MapCoord): VisibleTile {
+        const tile = this.map.getSafeTile(m);
+        return tile && tile.canvas ? tile : null;
+    }
+
     getArea(): MapArea {
         return {
             tl: toMap(this.screenToView({ sx: -this.width / 2, sy: this.height / 2 })),
-            br: toMap(this.screenToView({ sx: this.width / 2, sy: -this.height / 2 }))
+            br: toMap(this.screenToView({ sx: this.width / 2, sy: -this.height / 2 })),
         };
     }
 
@@ -110,8 +122,8 @@ export class Canvas {
             handler: (e: MouseEvent) => {
                 if (e.button === 1) {
                     this.panBase = null;
-                    
-                    this.render();                                       
+
+                    this.render();
 
                     const w = this.getViewCoord(e);
                     this.lastHoveredPosition = w;
@@ -189,20 +201,21 @@ export class Canvas {
 
     render(): void {
         const area = this.getArea();
-        forachAreaCoord( this.getArea(), m => {
+        forachAreaCoord(this.getArea(), m => {
             const tile = this.map.getSafeTile(m);
             if (tile) {
-                if (!tile._element) {
+                if (!tile.canvas) {
                     this.enter(tile, m);
+                } else {
+                    tile.canvas._renderPhase = this.renderPhase;
                 }
-                tile._renderPhase = this.renderPhase;
             }
         });
 
         if (this.previousMapArea) {
-            forachAreaCoord( this.previousMapArea, m => {
-                const tile = this.map.getSafeVisibleTile(m);
-                if (tile && tile._renderPhase !== this.renderPhase) {
+            forachAreaCoord(this.previousMapArea, m => {
+                const tile = this.getSafeVisibleTile(m);
+                if (tile && tile.canvas._renderPhase !== this.renderPhase) {
                     this.exit(tile, m);
                 }
             });
@@ -212,7 +225,7 @@ export class Canvas {
         this.previousMapArea = area;
     }
 
-    enter(tile: Tile, m: MapCoord) {
+    enter(tile: VisibleTile, m: MapCoord): void {
         const w = toView(m);
         const div = document.createElement('div');
         div.classList.add(styles.tile);
@@ -226,19 +239,22 @@ export class Canvas {
         div.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
 
         this.canvasElement.appendChild(div);
-        tile._element = div;
+        tile.canvas = {
+            _element: div,
+            _renderPhase: this.renderPhase
+        }
 
         this.layers.forEach(layer => {
-            layer.enter(tile);
+            layer.enter(tile, m);
         });
     }
 
-    exit(tile: Tile, m: MapCoord) {
+    exit(tile: VisibleTile, m: MapCoord): void {
         this.layers.forEach(layer => {
-            layer.exit(tile);
+            layer.exit(tile, m);
         });
-        tile._element.remove();
-        tile._element = null;
+        tile.canvas._element.remove();
+        tile.canvas = null;
     }
 
     setUiState(state: UiState): void {

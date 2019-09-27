@@ -1,7 +1,8 @@
-import { Tile } from '../hex/hexmap';
+import { VisibleTile } from '../canvas/canvas';
+import { MapCoord } from '../hex/hexGeo';
 
 export abstract class Layer {
-    abstract enter(tile: Tile): void;
-    abstract update(tile: Tile): void;
-    abstract exit(tile: Tile): void;
+    abstract enter(tile: VisibleTile, m: MapCoord): void;
+    abstract update(tile: VisibleTile, m: MapCoord): void;
+    abstract exit(tile: VisibleTile, m: MapCoord): void;
 }
