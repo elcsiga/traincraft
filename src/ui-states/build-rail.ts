@@ -3,11 +3,11 @@ import { ViewCoord, toMap, HexDir, getDir, shift, opposite } from '../hex/hexGeo
 import { VisibleTile, Canvas } from '../canvas/canvas';
 import {
     TileWithStructure,
-    toConnections,
-    setConnection,
-    toStructureDef,
     StructureLayer,
+    StructureDef,
 } from '../layers/structure/structure';
+import { toConnections, setConnection, toStructureDesc, StructureDesc } from '../layers/structure/structure-types';
+
 
 type Tile = VisibleTile & TileWithStructure;
 
@@ -63,30 +63,40 @@ export class BuildRail extends UiState {
         }
     }
 
+    private getNewDesc( tile: Tile, dir: HexDir, connetcion: string): StructureDesc | false {
+        const desc = tile.structure ? tile.structure.type : null
+        const connections = toConnections(desc);
+        const newConnections = setConnection(connections, connetcion, dir);
+        return toStructureDesc(newConnections);
+    }
+
+    private applyDesc( tile: Tile, newDewsc: StructureDesc ) {
+        if (!tile.structure && newDewsc) {
+            tile.structure = {
+                type: newDewsc,
+                _element: null
+            }
+            this.layer.enter(this.cursor.tile); // TODO refactor: dot definitely visible here
+        }
+        else if (tile.structure && newDewsc) {
+            tile.structure.type = newDewsc;
+            this.layer.update(this.cursor.tile);
+        }
+        else if (tile.structure && !newDewsc) {
+            tile.structure = null;
+            this.layer.exit(this.cursor.tile);
+        }
+    }
+
     click(): void {
         if (this.cursor) {
-            const connections = toConnections(this.cursor.tile.structure);
-            const neighbourConnections = toConnections(this.cursor.neighbourTile.structure);
 
-            const dir = this.cursor.dir;
-            const neighbourDir = opposite(dir);
+            const newDesc1 = this.getNewDesc(this.cursor.tile, this.cursor.dir, 'R');
+            const newDesc2 = this.getNewDesc(this.cursor.neighbourTile, opposite(this.cursor.dir), 'R');
 
-            const newConnections = setConnection(connections, 'R', dir);
-            const newNeighbourConnections = setConnection(neighbourConnections, 'R', neighbourDir);
-
-            const newStructureDef = toStructureDef(newConnections);
-            const newNeighBourStructureDef = toStructureDef(newNeighbourConnections);
-
-            if (newStructureDef !== false && newNeighBourStructureDef !== false) {
-                // TO BE CONTINUED
-
-                if (!this.cursor.tile.structure && newStructureDef) {
-                    this.layer.enter(this.cursor.tile);
-                } else if (newStructureDef) {
-                    this.layer.update(this.cursor.tile);
-                } else if (this.cursor.tile.structure && !newStructureDef) {
-                    this.layer.exit(this.cursor.tile);
-                }
+            if (newDesc1 !== false && newDesc2 !== false) {
+                this.applyDesc( this.cursor.tile, newDesc1 );
+                this.applyDesc( this.cursor.neighbourTile, newDesc2 );
             }
         }
     }
