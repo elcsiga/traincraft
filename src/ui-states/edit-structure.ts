@@ -16,10 +16,10 @@ interface RailCursor {
     tile2: Tile;
     dir: HexDir;
 }
-export class BuildRail extends UiState {
+export class EditStructure extends UiState {
     private cursor: RailCursor = null;
 
-    constructor(private canvas: Canvas, private layer: StructureLayer) {
+    constructor(private canvas: Canvas, private layer: StructureLayer, private connection: string) {
         super();
     }
 
@@ -53,19 +53,19 @@ export class BuildRail extends UiState {
                 tile1.canvas._element.style.opacity = '.7';
                 tile2.canvas._element.style.opacity = '.7';
 
-                this.cursor = {tile1, tile2, dir};
+                this.cursor = { tile1, tile2, dir };
             }
         }
     }
 
-    private getNewDesc( tile: Tile, dir: HexDir, connetcion: string): StructureDesc | false {
+    private getNewDesc(tile: Tile, dir: HexDir, connetcion: string): StructureDesc | false {
         const desc = tile.structure ? tile.structure.type : null
         const connections = toConnections(desc);
         const newConnections = setConnection(connections, connetcion, dir);
         return toStructureDesc(newConnections);
     }
 
-    private applyDesc( tile: Tile, newDewsc: StructureDesc ) {
+    private applyDesc(tile: Tile, newDewsc: StructureDesc) {
 
         console.log()
         if (!tile.structure && newDewsc) {
@@ -80,20 +80,22 @@ export class BuildRail extends UiState {
             this.layer.update(tile);
         }
         else if (tile.structure && !newDewsc) {
-            tile.structure = null;
             this.layer.exit(tile);
+            tile.structure = null;
         }
     }
 
-    click(): void {
+    click(e: MouseEvent): void {
         if (this.cursor) {
 
-            const newDesc1 = this.getNewDesc(this.cursor.tile1, this.cursor.dir, 'R');
-            const newDesc2 = this.getNewDesc(this.cursor.tile2, opposite(this.cursor.dir), 'R');
+            const connection = e.ctrlKey ? '_' : this.connection;
+
+            const newDesc1 = this.getNewDesc(this.cursor.tile1, this.cursor.dir, connection);
+            const newDesc2 = this.getNewDesc(this.cursor.tile2, opposite(this.cursor.dir), connection);
 
             if (newDesc1 !== false && newDesc2 !== false) {
-                this.applyDesc( this.cursor.tile1, newDesc1 );
-                this.applyDesc( this.cursor.tile2, newDesc2 );
+                this.applyDesc(this.cursor.tile1, newDesc1);
+                this.applyDesc(this.cursor.tile2, newDesc2);
             }
         }
     }

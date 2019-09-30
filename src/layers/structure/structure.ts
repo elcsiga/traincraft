@@ -25,7 +25,6 @@ export interface TileWithStructure {
 export class StructureLayer extends Layer {
     enter(tile: Tile): void {
         if (tile.structure) {
-            console.log('ENTER', tile.structure )
             const img = document.createElement('img');
             img.width = tileWidth;
             img.height = tileHeight;

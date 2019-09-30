@@ -172,7 +172,7 @@ export class Canvas {
             handler: (e: MouseEvent) => {
                 if (e.button === 0) {
                     const w = this.screenToView(this.getMousePos(e));
-                    this.uiState.click(w);
+                    this.uiState.click(e, w);
                 }
                 this.lastMousePos = this.getMousePos(e);
             },
