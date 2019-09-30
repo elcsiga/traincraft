@@ -35,4 +35,22 @@ export class TileMap<T> {
         }
         return null;
     }
+
+    load() {
+        try {
+            const m = JSON.parse(localStorage.getItem('MAP'));
+            if (m) {
+                this.map = m;
+                return true;
+            }
+            return false;
+        } catch(e) {
+            return false;
+        }
+
+    }
+
+    save() {
+        localStorage.setItem('MAP', JSON.stringify(this.map));
+    }
 }

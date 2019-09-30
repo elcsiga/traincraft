@@ -11,7 +11,8 @@ import { distance } from './hex/hexGeo';
 const MAP_SIZE = 10;
 type TrainCraftTile = VisibleTile & TileWithTerrain & TileWithStructure;
 const map = new TileMap<TrainCraftTile>(MAP_SIZE);
-map.create(m =>
+
+map.load() || map.create(m =>
     distance(m) > MAP_SIZE
         ? null
         : {
@@ -48,4 +49,6 @@ document.addEventListener('keypress', e => {
     if (e.key == '1') canvas.setUiState(uiStates[0]);
     if (e.key == '2') canvas.setUiState(uiStates[1]);
     if (e.key == '3') canvas.setUiState(uiStates[2]);
+
+    if (e.key == 's') map.save();
 });
