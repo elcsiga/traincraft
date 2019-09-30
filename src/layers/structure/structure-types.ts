@@ -103,7 +103,7 @@ export const structureTypes: StructureType[] = [
     },
     {
         image: roadRailCross1,
-        connections: 'S_RS_R',  
+        connections: 'S_RS_R',
         rotations: 6,
         next: p => {
             switch (p) {
@@ -147,7 +147,6 @@ export const structureTypes: StructureType[] = [
         rotations: 6,
         next: p => (p == 0 ? 3 : 0),
     },
-
 ];
 
 export function toStructureDesc(connections: string): StructureDesc | false {
@@ -178,7 +177,5 @@ export function toConnections(desc: StructureDesc): string {
 }
 
 export function setConnection(connections: string, connection: string, dir: HexDir): string {
-    return connections.substr(0, dir)
-    + connection
-    + connections.substr(dir + 1);
+    return connections.substr(0, dir) + connection + connections.substr(dir + 1);
 }

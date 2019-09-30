@@ -36,7 +36,7 @@ export class TileMap<T> {
         return null;
     }
 
-    load() {
+    load(): boolean {
         try {
             const m = JSON.parse(localStorage.getItem('MAP'));
             if (m) {
@@ -44,13 +44,12 @@ export class TileMap<T> {
                 return true;
             }
             return false;
-        } catch(e) {
+        } catch (e) {
             return false;
         }
-
     }
 
-    save() {
+    save(): void {
         localStorage.setItem('MAP', JSON.stringify(this.map));
     }
 }

@@ -1,13 +1,8 @@
 import { UiState } from './shared';
 import { ViewCoord, toMap, HexDir, getDir, shift, opposite } from '../hex/hexGeo';
 import { VisibleTile, Canvas } from '../canvas/canvas';
-import {
-    TileWithStructure,
-    StructureLayer,
-    StructureDef,
-} from '../layers/structure/structure';
+import { TileWithStructure, StructureLayer } from '../layers/structure/structure';
 import { toConnections, setConnection, toStructureDesc, StructureDesc } from '../layers/structure/structure-types';
-
 
 type Tile = VisibleTile & TileWithStructure;
 
@@ -59,27 +54,24 @@ export class EditStructure extends UiState {
     }
 
     private getNewDesc(tile: Tile, dir: HexDir, connetcion: string): StructureDesc | false {
-        const desc = tile.structure ? tile.structure.type : null
+        const desc = tile.structure ? tile.structure.type : null;
         const connections = toConnections(desc);
         const newConnections = setConnection(connections, connetcion, dir);
         return toStructureDesc(newConnections);
     }
 
-    private applyDesc(tile: Tile, newDewsc: StructureDesc) {
-
-        console.log()
+    private applyDesc(tile: Tile, newDewsc: StructureDesc): void {
+        console.log();
         if (!tile.structure && newDewsc) {
             tile.structure = {
                 type: newDewsc,
-                _element: null
-            }
+                _element: null,
+            };
             this.layer.enter(tile); // TODO refactor: dot definitely visible here
-        }
-        else if (tile.structure && newDewsc) {
+        } else if (tile.structure && newDewsc) {
             tile.structure.type = newDewsc;
             this.layer.update(tile);
-        }
-        else if (tile.structure && !newDewsc) {
+        } else if (tile.structure && !newDewsc) {
             this.layer.exit(tile);
             tile.structure = null;
         }
@@ -87,7 +79,6 @@ export class EditStructure extends UiState {
 
     click(e: MouseEvent): void {
         if (this.cursor) {
-
             const connection = e.ctrlKey ? '_' : this.connection;
 
             const newDesc1 = this.getNewDesc(this.cursor.tile1, this.cursor.dir, connection);

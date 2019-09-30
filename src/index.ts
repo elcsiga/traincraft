@@ -12,18 +12,19 @@ const MAP_SIZE = 10;
 type TrainCraftTile = VisibleTile & TileWithTerrain & TileWithStructure;
 const map = new TileMap<TrainCraftTile>(MAP_SIZE);
 
-map.load() || map.create(m =>
-    distance(m) > MAP_SIZE
-        ? null
-        : {
-              terrain: {
-                  type: 'empty',
-                  _element: null,
+map.load() ||
+    map.create(m =>
+        distance(m) > MAP_SIZE
+            ? null
+            : {
+                  terrain: {
+                      type: 'empty',
+                      _element: null,
+                  },
+                  structure: null,
+                  canvas: null,
               },
-              structure: null,
-              canvas: null,
-          },
-);
+    );
 
 const terrainLayer = new TerrainLayer();
 const structureLayer = new StructureLayer();

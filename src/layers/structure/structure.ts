@@ -1,6 +1,6 @@
 import { Layer } from '../layer';
 import { VisibleTile } from '../../canvas/canvas';
-import { tileWidth, tileHeight, HexDir } from '../../hex/hexGeo';
+import { tileWidth, tileHeight } from '../../hex/hexGeo';
 import { structureTypes, StructureDesc } from './structure-types';
 
 import * as styles from './structure.scss';
@@ -12,7 +12,6 @@ import * as styles from './structure.scss';
 //////////////////////
 
 type Tile = VisibleTile & TileWithStructure;
-
 
 export interface StructureDef {
     type: StructureDesc;
@@ -42,7 +41,6 @@ export class StructureLayer extends Layer {
         const rotation = tile.structure.type.rotation;
         element.src = type.image;
         element.style.transform = `rotate(${rotation * 60 + 180}deg)`;
-
     }
     exit(tile: Tile): void {
         if (tile.structure) {
