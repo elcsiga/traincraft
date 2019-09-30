@@ -13,4 +13,5 @@
 
 .tile {
     position: absolute;
+    transition: opacity .1s ease-in-out;
 }

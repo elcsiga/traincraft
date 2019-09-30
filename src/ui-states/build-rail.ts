@@ -12,8 +12,8 @@ import { toConnections, setConnection, toStructureDesc, StructureDesc } from '..
 type Tile = VisibleTile & TileWithStructure;
 
 interface RailCursor {
-    tile: Tile;
-    neighbourTile: Tile;
+    tile1: Tile;
+    tile2: Tile;
     dir: HexDir;
 }
 export class BuildRail extends UiState {
@@ -25,11 +25,11 @@ export class BuildRail extends UiState {
 
     resetHover(): void {
         if (this.cursor) {
-            if (this.cursor.tile.canvas) {
-                this.cursor.tile.canvas._element.style.opacity = '1';
+            if (this.cursor.tile1.canvas) {
+                this.cursor.tile1.canvas._element.style.opacity = '1';
             }
-            if (this.cursor.neighbourTile.canvas) {
-                this.cursor.neighbourTile.canvas._element.style.opacity = '1';
+            if (this.cursor.tile2.canvas) {
+                this.cursor.tile2.canvas._element.style.opacity = '1';
             }
         }
     }
@@ -45,20 +45,15 @@ export class BuildRail extends UiState {
     hover(w: ViewCoord): void {
         const m = toMap(w);
         this.resetHover();
-        const tile = this.canvas.getSafeVisibleTile(m) as Tile;
-        if (tile) {
-            const neighbourDir: HexDir = getDir(m, w);
-            const neighBourTile = this.canvas.getSafeVisibleTile(shift(m, neighbourDir)) as Tile;
-            if (neighBourTile) {
-                neighBourTile.canvas._element.style.opacity = '.7';
+        const tile1 = this.canvas.getSafeVisibleTile(m) as Tile;
+        if (tile1) {
+            const dir: HexDir = getDir(m, w);
+            const tile2 = this.canvas.getSafeVisibleTile(shift(m, dir)) as Tile;
+            if (tile2) {
+                tile1.canvas._element.style.opacity = '.7';
+                tile2.canvas._element.style.opacity = '.7';
 
-                tile.canvas._element.style.opacity = '.7';
-
-                this.cursor = {
-                    tile,
-                    neighbourTile: neighBourTile,
-                    dir: neighbourDir,
-                };
+                this.cursor = {tile1, tile2, dir};
             }
         }
     }
@@ -71,32 +66,34 @@ export class BuildRail extends UiState {
     }
 
     private applyDesc( tile: Tile, newDewsc: StructureDesc ) {
+
+        console.log()
         if (!tile.structure && newDewsc) {
             tile.structure = {
                 type: newDewsc,
                 _element: null
             }
-            this.layer.enter(this.cursor.tile); // TODO refactor: dot definitely visible here
+            this.layer.enter(tile); // TODO refactor: dot definitely visible here
         }
         else if (tile.structure && newDewsc) {
             tile.structure.type = newDewsc;
-            this.layer.update(this.cursor.tile);
+            this.layer.update(tile);
         }
         else if (tile.structure && !newDewsc) {
             tile.structure = null;
-            this.layer.exit(this.cursor.tile);
+            this.layer.exit(tile);
         }
     }
 
     click(): void {
         if (this.cursor) {
 
-            const newDesc1 = this.getNewDesc(this.cursor.tile, this.cursor.dir, 'R');
-            const newDesc2 = this.getNewDesc(this.cursor.neighbourTile, opposite(this.cursor.dir), 'R');
+            const newDesc1 = this.getNewDesc(this.cursor.tile1, this.cursor.dir, 'R');
+            const newDesc2 = this.getNewDesc(this.cursor.tile2, opposite(this.cursor.dir), 'R');
 
             if (newDesc1 !== false && newDesc2 !== false) {
-                this.applyDesc( this.cursor.tile, newDesc1 );
-                this.applyDesc( this.cursor.neighbourTile, newDesc2 );
+                this.applyDesc( this.cursor.tile1, newDesc1 );
+                this.applyDesc( this.cursor.tile2, newDesc2 );
             }
         }
     }
