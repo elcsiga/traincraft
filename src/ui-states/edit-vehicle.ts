@@ -1,20 +1,19 @@
 import { UiState } from './shared';
 import { toMap, ViewCoord, MapCoord, HexDir } from '../hex/hexGeo';
-import { TerrainType, TerrainLayer, TileWithTerrain, VisibleTileWithTerrain } from '../layers/terrain/terrain';
 import { VisibleTile, Canvas } from '../canvas/canvas';
-import { Vehicle } from '../vehicles/vehicle';
+import { StructureLayer, TileWithStructure } from '../layers/structure/structure';
+import { VehicleDef, getInitialVehiclePosition } from '../vehicles/vehicle';
 
-type Tile = VisibleTile;
+type Tile = VisibleTile & TileWithStructure;
 
 interface VehicleCursor {
     tile: Tile;
-    coord: MapCoord;
-    dir: HexDir;
+    position: MapCoord;
 }
 export class EditVehicle extends UiState {
     cursor: VehicleCursor;
 
-    constructor(private canvas: Canvas, private layer: TerrainLayer, private type: TerrainType) {
+    constructor(private canvas: Canvas, private layer: StructureLayer) {
         super();
     }
 
@@ -33,23 +32,26 @@ export class EditVehicle extends UiState {
     }
 
     hover(w: ViewCoord): void {
-        const coord = toMap(w);
+        const position = toMap(w);
         this.resetHover();
 
-        const tile = this.canvas.getSafeVisibleTile(coord);
+        const tile = this.canvas.getSafeVisibleTile(position);
         if (tile) {
             tile.canvas.containerElement.style.opacity = '.5';
-            const dir: HexDir = 1;
-            this.cursor = {
-                tile, coord, dir
-            }
+            this.cursor = { tile, position }
         }
     }
 
     click(): void {
         if (this.cursor) {
-            const vehicle = new Vehicle( );
-
+            const v: VehicleDef = getInitialVehiclePosition(
+                this.cursor.position,
+                this.cursor.tile,
+                'R'
+            );
+            if (v) {
+                
+            }    
 
 
         }

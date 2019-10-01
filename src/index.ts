@@ -7,6 +7,7 @@ import { Layer } from './layers/layer';
 import { TerrainLayer, TileWithTerrain } from './layers/terrain/terrain';
 import { StructureLayer, TileWithStructure } from './layers/structure/structure';
 import { distance } from './hex/hexGeo';
+import { EditVehicle } from './ui-states/edit-vehicle';
 
 const MAP_SIZE = 10;
 type TrainCraftTile = VisibleTile & TileWithTerrain & TileWithStructure;
@@ -34,6 +35,7 @@ const uiStates = [
     new EditTerrain(canvas, terrainLayer, 'water'),
     new EditStructure(canvas, structureLayer, 'R'),
     new EditStructure(canvas, structureLayer, 'S'),
+    new EditVehicle(canvas, structureLayer)
 ];
 canvas.setUiState(uiStates[0]);
 
