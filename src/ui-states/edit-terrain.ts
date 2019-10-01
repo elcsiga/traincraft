@@ -1,9 +1,9 @@
 import { UiState } from './shared';
 import { toMap, ViewCoord } from '../hex/hexGeo';
-import { TerrainType, TerrainLayer, TileWithTerrain } from '../layers/terrain/terrain';
+import { TerrainType, TerrainLayer, TileWithTerrain, VisibleTileWithTerrain } from '../layers/terrain/terrain';
 import { VisibleTile, Canvas } from '../canvas/canvas';
 
-type Tile = VisibleTile & TileWithTerrain;
+type Tile = VisibleTile & TileWithTerrain & VisibleTileWithTerrain;
 export class EditTerrain extends UiState {
     cursorTile: Tile;
 
@@ -13,7 +13,7 @@ export class EditTerrain extends UiState {
 
     resetHover(): void {
         if (this.cursorTile && this.cursorTile.canvas) {
-            this.cursorTile.canvas._element.style.opacity = '1';
+            this.cursorTile.canvas.containerElement.style.opacity = '1';
         }
     }
 
@@ -31,7 +31,7 @@ export class EditTerrain extends UiState {
 
         const tile = this.canvas.getSafeVisibleTile(m);
         if (tile) {
-            tile.canvas._element.style.opacity = '.5';
+            tile.canvas.containerElement.style.opacity = '.5';
             this.cursorTile = tile as Tile;
         }
     }

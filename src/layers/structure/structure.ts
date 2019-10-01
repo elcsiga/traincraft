@@ -1,7 +1,7 @@
 import { Layer } from '../layer';
 import { VisibleTile } from '../../canvas/canvas';
 import { tileWidth, tileHeight } from '../../hex/hexGeo';
-import { structureTypes, StructureDesc } from './structure-types';
+import { structureTypes, StructureDef } from './structure-types';
 
 import * as styles from './structure.scss';
 
@@ -11,14 +11,15 @@ import * as styles from './structure.scss';
 //
 //////////////////////
 
-type Tile = VisibleTile & TileWithStructure;
+type Tile = VisibleTile & TileWithStructure & VisibleTileWithStructure;
 
-export interface StructureDef {
-    type: StructureDesc;
-    _element: HTMLImageElement;
-}
 export interface TileWithStructure {
-    structure: StructureDef;
+    structure?: StructureDef;
+}
+export interface VisibleTileWithStructure {
+    canvas: {
+        _structureElement: HTMLImageElement;
+    }
 }
 
 export class StructureLayer extends Layer {
@@ -29,23 +30,23 @@ export class StructureLayer extends Layer {
             img.height = tileHeight;
             img.classList.add(styles.tile);
 
-            tile.structure._element = img;
-            tile.canvas._element.appendChild(img);
+            tile.canvas._structureElement = img;
+            tile.canvas.containerElement.appendChild(img);
 
             this.update(tile);
         }
     }
     update(tile: Tile): void {
-        const type = structureTypes[tile.structure.type.index];
-        const element = tile.structure._element;
-        const rotation = tile.structure.type.rotation;
+        const type = structureTypes[tile.structure.index];
+        const element = tile.canvas._structureElement;
+        const rotation = tile.structure.rotation;
         element.src = type.image;
         element.style.transform = `rotate(${rotation * 60 + 180}deg)`;
     }
     exit(tile: Tile): void {
         if (tile.structure) {
-            tile.structure._element.remove();
-            tile.structure._element = null;
+            tile.canvas._structureElement.remove();
+            delete tile.canvas._structureElement;
         }
     }
 }

@@ -11,16 +11,21 @@ import { VisibleTile } from '../../canvas/canvas';
 //////////////////////
 
 export type TerrainType = 'empty' | 'water';
-type Tile = VisibleTile & TileWithTerrain;
+type Tile = VisibleTile & TileWithTerrain & VisibleTileWithTerrain;
 
 export interface TerrainDef {
     type: TerrainType;
-    _element: HTMLImageElement;
 }
 
 export interface TileWithTerrain {
-    terrain: TerrainDef;
+    terrain?: TerrainDef;
 }
+export interface VisibleTileWithTerrain {
+    canvas: {
+        terrainElement: HTMLImageElement;
+    }
+}
+
 
 export class TerrainLayer extends Layer {
     getBackgroundImage(tile: TileWithTerrain): string {
@@ -36,19 +41,19 @@ export class TerrainLayer extends Layer {
             const img = document.createElement('img');
             img.width = tileWidth;
             img.height = tileHeight;
-            tile.terrain._element = img;
-            tile.canvas._element.appendChild(img);
+            tile.canvas.terrainElement = img;
+            tile.canvas.containerElement.appendChild(img);
 
             this.update(tile);
         }
     }
     update(tile: Tile): void {
-        tile.terrain._element.src = this.getBackgroundImage(tile);
+        tile.canvas.terrainElement.src = this.getBackgroundImage(tile);
     }
     exit(tile: Tile): void {
         if (tile.terrain) {
-            tile.terrain._element.remove();
-            tile.terrain._element = null;
+            tile.canvas.terrainElement.remove();
+            delete tile.canvas.terrainElement;
         }
     }
 }

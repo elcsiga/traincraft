@@ -24,7 +24,7 @@ export interface StructureType {
     next: (a: number) => number;
 }
 
-export interface StructureDesc {
+export interface StructureDef {
     index: number;
     rotation: HexDir;
 }
@@ -149,7 +149,7 @@ export const structureTypes: StructureType[] = [
     },
 ];
 
-export function toStructureDesc(connections: string): StructureDesc | false {
+export function toStructureDef(connections: string): StructureDef | false {
     if (connections === '______') {
         return null;
     }
@@ -166,11 +166,11 @@ export function toStructureDesc(connections: string): StructureDesc | false {
     return false; //no match
 }
 
-export function toConnections(desc: StructureDesc): string {
-    if (desc) {
-        const type = structureTypes[desc.index];
+export function toConnections(def: StructureDef): string {
+    if (def) {
+        const type = structureTypes[def.index];
         const c3x = type.connections + type.connections;
-        return c3x.substring(desc.rotation, desc.rotation + 6);
+        return c3x.substring(def.rotation, def.rotation + 6);
     } else {
         return '______';
     }

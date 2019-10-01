@@ -18,11 +18,8 @@ map.load() ||
             ? null
             : {
                   terrain: {
-                      type: 'empty',
-                      _element: null,
-                  },
-                  structure: null,
-                  canvas: null,
+                      type: 'empty'
+                  }
               },
     );
 

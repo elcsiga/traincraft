@@ -5,9 +5,9 @@ import { UiState } from '../ui-states/shared';
 import { Layer } from '../layers/layer';
 
 export interface VisibleTile {
-    canvas: {
-        _element: HTMLElement;
-        _renderPhase: RnderPhase;
+    canvas?: {
+        containerElement: HTMLElement;
+        renderPhase: RnderPhase;
     };
 }
 
@@ -256,7 +256,7 @@ export class Canvas {
                 if (!tile.canvas) {
                     this.enter(tile, m);
                 } else {
-                    tile.canvas._renderPhase = this.renderPhase;
+                    tile.canvas.renderPhase = this.renderPhase;
                 }
             }
         });
@@ -264,7 +264,7 @@ export class Canvas {
         if (this.previousMapArea) {
             forachAreaCoord(this.previousMapArea, m => {
                 const tile = this.getSafeVisibleTile(m);
-                if (tile && tile.canvas._renderPhase !== this.renderPhase) {
+                if (tile && tile.canvas.renderPhase !== this.renderPhase) {
                     this.exit(tile, m);
                 }
             });
@@ -289,8 +289,8 @@ export class Canvas {
 
         this.canvasElement.appendChild(div);
         tile.canvas = {
-            _element: div,
-            _renderPhase: this.renderPhase,
+            containerElement: div,
+            renderPhase: this.renderPhase,
         };
 
         this.layers.forEach(layer => {
@@ -302,8 +302,8 @@ export class Canvas {
         this.layers.forEach(layer => {
             layer.exit(tile, m);
         });
-        tile.canvas._element.remove();
-        tile.canvas = null;
+        tile.canvas.containerElement.remove();
+        delete tile.canvas;
     }
 
     setUiState(state: UiState): void {

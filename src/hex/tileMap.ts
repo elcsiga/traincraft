@@ -1,4 +1,5 @@
 import { MapCoord } from './hexGeo';
+import { VisibleTile } from '../canvas/canvas';
 
 export class TileMap<T> {
     private map: T[][] = [];
@@ -50,6 +51,19 @@ export class TileMap<T> {
     }
 
     save(): void {
-        localStorage.setItem('MAP', JSON.stringify(this.map));
+        const clone: any[][] = [];
+        const arrayLength = this.size * 2 + 1;
+        for (let x = 0; x < arrayLength; x++) {
+            clone[x] = [];
+            for (let y = 0; y < arrayLength; y++) {
+                if (this.map[x][y]) {
+                    const {canvas, ...withoutCanvas} = this.map[x][y] as VisibleTile;
+                    clone[x][y] = withoutCanvas;
+                } else {
+                    clone[x][y] = null;
+                }
+            }
+        }
+        localStorage.setItem('MAP', JSON.stringify(clone));
     }
 }

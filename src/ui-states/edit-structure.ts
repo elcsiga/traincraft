@@ -1,10 +1,10 @@
 import { UiState } from './shared';
 import { ViewCoord, toMap, HexDir, getDir, shift, opposite } from '../hex/hexGeo';
 import { VisibleTile, Canvas } from '../canvas/canvas';
-import { TileWithStructure, StructureLayer } from '../layers/structure/structure';
-import { toConnections, setConnection, toStructureDesc, StructureDesc } from '../layers/structure/structure-types';
+import { TileWithStructure, StructureLayer, VisibleTileWithStructure } from '../layers/structure/structure';
+import { toConnections, setConnection, toStructureDef, StructureDef } from '../layers/structure/structure-types';
 
-type Tile = VisibleTile & TileWithStructure;
+type Tile = VisibleTile & TileWithStructure  & VisibleTileWithStructure;
 
 interface RailCursor {
     tile1: Tile;
@@ -21,10 +21,10 @@ export class EditStructure extends UiState {
     resetHover(): void {
         if (this.cursor) {
             if (this.cursor.tile1.canvas) {
-                this.cursor.tile1.canvas._element.style.opacity = '1';
+                this.cursor.tile1.canvas.containerElement.style.opacity = '1';
             }
             if (this.cursor.tile2.canvas) {
-                this.cursor.tile2.canvas._element.style.opacity = '1';
+                this.cursor.tile2.canvas.containerElement.style.opacity = '1';
             }
         }
     }
@@ -45,35 +45,31 @@ export class EditStructure extends UiState {
             const dir: HexDir = getDir(m, w);
             const tile2 = this.canvas.getSafeVisibleTile(shift(m, dir)) as Tile;
             if (tile2) {
-                tile1.canvas._element.style.opacity = '.7';
-                tile2.canvas._element.style.opacity = '.7';
+                tile1.canvas.containerElement.style.opacity = '.7';
+                tile2.canvas.containerElement.style.opacity = '.7';
 
                 this.cursor = { tile1, tile2, dir };
             }
         }
     }
 
-    private getNewDesc(tile: Tile, dir: HexDir, connetcion: string): StructureDesc | false {
-        const desc = tile.structure ? tile.structure.type : null;
-        const connections = toConnections(desc);
+    private getNewDef(tile: Tile, dir: HexDir, connetcion: string): StructureDef | false {
+        const connections = toConnections(tile.structure);
         const newConnections = setConnection(connections, connetcion, dir);
-        return toStructureDesc(newConnections);
+        return toStructureDef(newConnections);
     }
 
-    private applyDesc(tile: Tile, newDewsc: StructureDesc): void {
+    private applyDef(tile: Tile, newDewsc: StructureDef): void {
         console.log();
         if (!tile.structure && newDewsc) {
-            tile.structure = {
-                type: newDewsc,
-                _element: null,
-            };
+            tile.structure = newDewsc;
             this.layer.enter(tile); // TODO refactor: dot definitely visible here
         } else if (tile.structure && newDewsc) {
-            tile.structure.type = newDewsc;
+            tile.structure = newDewsc;
             this.layer.update(tile);
         } else if (tile.structure && !newDewsc) {
             this.layer.exit(tile);
-            tile.structure = null;
+            delete tile.structure;
         }
     }
 
@@ -81,12 +77,12 @@ export class EditStructure extends UiState {
         if (this.cursor) {
             const connection = e.ctrlKey ? '_' : this.connection;
 
-            const newDesc1 = this.getNewDesc(this.cursor.tile1, this.cursor.dir, connection);
-            const newDesc2 = this.getNewDesc(this.cursor.tile2, opposite(this.cursor.dir), connection);
+            const newDef1 = this.getNewDef(this.cursor.tile1, this.cursor.dir, connection);
+            const newDef2 = this.getNewDef(this.cursor.tile2, opposite(this.cursor.dir), connection);
 
-            if (newDesc1 !== false && newDesc2 !== false) {
-                this.applyDesc(this.cursor.tile1, newDesc1);
-                this.applyDesc(this.cursor.tile2, newDesc2);
+            if (newDef1 !== false && newDef2 !== false) {
+                this.applyDef(this.cursor.tile1, newDef1);
+                this.applyDef(this.cursor.tile2, newDef2);
             }
         }
     }
