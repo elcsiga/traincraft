@@ -2,8 +2,11 @@ import { UiState } from './shared';
 import { toMap, ViewCoord } from '../hex/hexGeo';
 import { TerrainType, TerrainLayer, TileWithTerrain, VisibleTileWithTerrain } from '../layers/terrain/terrain';
 import { VisibleTile, Canvas } from '../canvas/canvas';
+import { TileWithStructure } from '../layers/structure/structure';
 
-type Tile = VisibleTile & TileWithTerrain & VisibleTileWithTerrain;
+type Tile = VisibleTile & TileWithTerrain
+    & VisibleTileWithTerrain & TileWithStructure;
+
 export class EditTerrain extends UiState {
     cursorTile: Tile;
 
@@ -29,8 +32,8 @@ export class EditTerrain extends UiState {
         const m = toMap(w);
         this.resetHover();
 
-        const tile = this.canvas.getSafeVisibleTile(m);
-        if (tile) {
+        const tile = this.canvas.getSafeVisibleTile(m) as Tile;
+        if (tile && !tile.structure) {
             tile.canvas.containerElement.style.opacity = '.5';
             this.cursorTile = tile as Tile;
         }

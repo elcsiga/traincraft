@@ -1,14 +1,18 @@
 import { UiState } from './shared';
-import { ViewCoord, toMap, HexDir, getDir, shift, opposite } from '../hex/hexGeo';
+import { ViewCoord, toMap, HexDir, getDir, shift, opposite, tileWidth, tileHeight } from '../hex/hexGeo';
 import { VisibleTile, Canvas } from '../canvas/canvas';
 import { TileWithStructure, StructureLayer, VisibleTileWithStructure } from '../layers/structure/structure';
-import { toConnections, setConnection, toStructureDef, StructureDef } from '../layers/structure/structure-types';
+import { toConnections, setConnection, toStructureDef, StructureDef, structureTypes } from '../layers/structure/structure-types';
 
-type Tile = VisibleTile & TileWithStructure  & VisibleTileWithStructure;
+import * as styles from './edit-structure.scss';
+
+type Tile = VisibleTile & TileWithStructure & VisibleTileWithStructure;
 
 interface RailCursor {
     tile1: Tile;
     tile2: Tile;
+    overlay1: HTMLElement;
+    overlay2: HTMLElement;
     dir: HexDir;
 }
 export class EditStructure extends UiState {
@@ -26,6 +30,10 @@ export class EditStructure extends UiState {
             if (this.cursor.tile2.canvas) {
                 this.cursor.tile2.canvas.containerElement.style.opacity = '1';
             }
+            if (this.cursor.overlay1)
+                this.cursor.overlay1.remove();
+            if (this.cursor.overlay2)
+                this.cursor.overlay2.remove();
         }
     }
 
@@ -37,7 +45,21 @@ export class EditStructure extends UiState {
         // disabled
     }
 
-    hover(w: ViewCoord): void {
+    getOverlayImage(def: StructureDef): HTMLElement {
+        const img = document.createElement('img');
+        img.width = tileWidth;
+        img.height = tileHeight;
+        img.classList.add(styles.structireCursor);
+
+        const type = structureTypes[def.index];
+        const rotation = def.rotation;
+        img.src = type.image;
+        img.style.transform = `rotate(${rotation * 60 + 180}deg)`;
+
+        return img;
+    }
+
+    hover(w: ViewCoord, e: MouseEvent): void {
         const m = toMap(w);
         this.resetHover();
         const tile1 = this.canvas.getSafeVisibleTile(m) as Tile;
@@ -45,10 +67,22 @@ export class EditStructure extends UiState {
             const dir: HexDir = getDir(m, w);
             const tile2 = this.canvas.getSafeVisibleTile(shift(m, dir)) as Tile;
             if (tile2) {
-                tile1.canvas.containerElement.style.opacity = '.7';
-                tile2.canvas.containerElement.style.opacity = '.7';
+                const connection = e && e.ctrlKey ? '_' : this.connection;
 
-                this.cursor = { tile1, tile2, dir };
+                const newDef1 = this.getNewDef(this.cursor.tile1, this.cursor.dir, connection);
+                const newDef2 = this.getNewDef(this.cursor.tile2, opposite(this.cursor.dir), connection);
+
+                if (newDef1 !== false && newDef2 !== false) {
+                    const overlay1 = this.getOverlayImage(newDef1);
+                    const overlay2 = this.getOverlayImage(newDef2);
+
+                    tile1.canvas.containerElement.style.opacity = '.7';
+                    tile2.canvas.containerElement.style.opacity = '.7';
+                    tile1.canvas.containerElement.appendChild(overlay1);
+                    tile2.canvas.containerElement.appendChild(overlay2);
+
+                    this.cursor = { tile1, tile2, dir, overlay1, overlay2 };
+                }
             }
         }
     }
@@ -73,9 +107,9 @@ export class EditStructure extends UiState {
         }
     }
 
-    click(e: MouseEvent): void {
+    click(w: ViewCoord, e: MouseEvent): void {
         if (this.cursor) {
-            const connection = e.ctrlKey ? '_' : this.connection;
+            const connection = e && e.ctrlKey ? '_' : this.connection;
 
             const newDef1 = this.getNewDef(this.cursor.tile1, this.cursor.dir, connection);
             const newDef2 = this.getNewDef(this.cursor.tile2, opposite(this.cursor.dir), connection);

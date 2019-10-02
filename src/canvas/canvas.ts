@@ -77,7 +77,7 @@ export class Canvas {
     private hover(e: MouseEvent): void {
         const w = this.screenToView(this.getMousePos(e));
         this.lastHoveredPosition = w;
-        this.uiState.hover(w);
+        this.uiState.hover(w, e);
     }
 
     private resetHover(): void {
@@ -172,7 +172,7 @@ export class Canvas {
             handler: (e: MouseEvent) => {
                 if (e.button === 0) {
                     const w = this.screenToView(this.getMousePos(e));
-                    this.uiState.click(e, w);
+                    this.uiState.click(w, e);
                 }
                 this.lastMousePos = this.getMousePos(e);
             },
@@ -315,7 +315,7 @@ export class Canvas {
         this.uiState.enable();
 
         if (this.lastHoveredPosition) {
-            state.hover(this.lastHoveredPosition);
+            state.hover(this.lastHoveredPosition, null);
         }
     }
 }
