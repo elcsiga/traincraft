@@ -4,5 +4,6 @@
     top: 0;
     left: 0;
     z-index: 100;
-    opacity: 0.5;
+    opacity: .9;
+    filter: brightness(20) blur(3px);
 }

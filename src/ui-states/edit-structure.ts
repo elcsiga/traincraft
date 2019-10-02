@@ -24,12 +24,6 @@ export class EditStructure extends UiState {
 
     resetHover(): void {
         if (this.cursor) {
-            if (this.cursor.tile1.canvas) {
-                this.cursor.tile1.canvas.containerElement.style.opacity = '1';
-            }
-            if (this.cursor.tile2.canvas) {
-                this.cursor.tile2.canvas.containerElement.style.opacity = '1';
-            }
             if (this.cursor.overlay1)
                 this.cursor.overlay1.remove();
             if (this.cursor.overlay2)
@@ -46,16 +40,18 @@ export class EditStructure extends UiState {
     }
 
     getOverlayImage(def: StructureDef): HTMLElement {
+
         const img = document.createElement('img');
         img.width = tileWidth;
         img.height = tileHeight;
         img.classList.add(styles.structireCursor);
 
-        const type = structureTypes[def.index];
-        const rotation = def.rotation;
-        img.src = type.image;
-        img.style.transform = `rotate(${rotation * 60 + 180}deg)`;
-
+        if (def) {
+            const type = structureTypes[def.index];
+            const rotation = def.rotation;
+            img.src = type.image;
+            img.style.transform = `rotate(${rotation * 60 + 180}deg)`;
+        }
         return img;
     }
 
@@ -69,15 +65,13 @@ export class EditStructure extends UiState {
             if (tile2) {
                 const connection = e && e.ctrlKey ? '_' : this.connection;
 
-                const newDef1 = this.getNewDef(tile1, this.cursor.dir, connection);
-                const newDef2 = this.getNewDef(tile2, opposite(this.cursor.dir), connection);
+                const newDef1 = this.getNewDef(tile1, dir, connection);
+                const newDef2 = this.getNewDef(tile2, opposite(dir), connection);
 
                 if (newDef1 !== false && newDef2 !== false) {
                     const overlay1 = this.getOverlayImage(newDef1);
                     const overlay2 = this.getOverlayImage(newDef2);
 
-                    tile1.canvas.containerElement.style.opacity = '.7';
-                    tile2.canvas.containerElement.style.opacity = '.7';
                     tile1.canvas.containerElement.appendChild(overlay1);
                     tile2.canvas.containerElement.appendChild(overlay2);
 

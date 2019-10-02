@@ -37,7 +37,7 @@ const uiStates = [
     new EditStructure(canvas, structureLayer, 'S'),
     new EditVehicle(canvas, structureLayer)
 ];
-canvas.setUiState(uiStates[0]);
+canvas.setUiState(uiStates[2]);
 
 const demoCanvas = document.createElement('div');
 demoCanvas.classList.add(styles.demoCanvas);
