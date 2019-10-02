@@ -69,8 +69,8 @@ export class EditStructure extends UiState {
             if (tile2) {
                 const connection = e && e.ctrlKey ? '_' : this.connection;
 
-                const newDef1 = this.getNewDef(this.cursor.tile1, this.cursor.dir, connection);
-                const newDef2 = this.getNewDef(this.cursor.tile2, opposite(this.cursor.dir), connection);
+                const newDef1 = this.getNewDef(tile1, this.cursor.dir, connection);
+                const newDef2 = this.getNewDef(tile2, opposite(this.cursor.dir), connection);
 
                 if (newDef1 !== false && newDef2 !== false) {
                     const overlay1 = this.getOverlayImage(newDef1);
