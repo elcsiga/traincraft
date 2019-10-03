@@ -23,9 +23,8 @@ export interface TileWithTerrain {
 export interface VisibleTileWithTerrain {
     canvas: {
         terrainElement: HTMLImageElement;
-    }
+    };
 }
-
 
 export class TerrainLayer extends Layer {
     getBackgroundImage(tile: TileWithTerrain): string {

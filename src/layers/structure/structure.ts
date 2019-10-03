@@ -19,7 +19,7 @@ export interface TileWithStructure {
 export interface VisibleTileWithStructure {
     canvas: {
         _structureElement: HTMLImageElement;
-    }
+    };
 }
 
 export class StructureLayer extends Layer {

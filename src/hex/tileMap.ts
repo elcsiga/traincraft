@@ -57,7 +57,7 @@ export class TileMap<T> {
             clone[x] = [];
             for (let y = 0; y < arrayLength; y++) {
                 if (this.map[x][y]) {
-                    const {canvas, ...withoutCanvas} = this.map[x][y] as VisibleTile;
+                    const { canvas, ...withoutCanvas } = this.map[x][y] as VisibleTile;
                     clone[x][y] = withoutCanvas;
                 } else {
                     clone[x][y] = null;

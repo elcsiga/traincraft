@@ -4,8 +4,7 @@ import { TerrainType, TerrainLayer, TileWithTerrain, VisibleTileWithTerrain } fr
 import { VisibleTile, Canvas } from '../canvas/canvas';
 import { TileWithStructure } from '../layers/structure/structure';
 
-type Tile = VisibleTile & TileWithTerrain
-    & VisibleTileWithTerrain & TileWithStructure;
+type Tile = VisibleTile & TileWithTerrain & VisibleTileWithTerrain & TileWithStructure;
 
 export class EditTerrain extends UiState {
     cursorTile: Tile;

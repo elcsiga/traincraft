@@ -2,7 +2,13 @@ import { UiState } from './shared';
 import { ViewCoord, toMap, HexDir, getDir, shift, opposite, tileWidth, tileHeight } from '../hex/hexGeo';
 import { VisibleTile, Canvas } from '../canvas/canvas';
 import { TileWithStructure, StructureLayer, VisibleTileWithStructure } from '../layers/structure/structure';
-import { toConnections, setConnection, toStructureDef, StructureDef, structureTypes } from '../layers/structure/structure-types';
+import {
+    toConnections,
+    setConnection,
+    toStructureDef,
+    StructureDef,
+    structureTypes,
+} from '../layers/structure/structure-types';
 
 import * as styles from './edit-structure.scss';
 
@@ -24,10 +30,8 @@ export class EditStructure extends UiState {
 
     resetHover(): void {
         if (this.cursor) {
-            if (this.cursor.overlay1)
-                this.cursor.overlay1.remove();
-            if (this.cursor.overlay2)
-                this.cursor.overlay2.remove();
+            if (this.cursor.overlay1) this.cursor.overlay1.remove();
+            if (this.cursor.overlay2) this.cursor.overlay2.remove();
         }
     }
 
@@ -40,7 +44,6 @@ export class EditStructure extends UiState {
     }
 
     getOverlayImage(def: StructureDef): HTMLElement {
-
         const img = document.createElement('img');
         img.width = tileWidth;
         img.height = tileHeight;
@@ -88,7 +91,6 @@ export class EditStructure extends UiState {
     }
 
     private applyDef(tile: Tile, newDewsc: StructureDef): void {
-        console.log();
         if (!tile.structure && newDewsc) {
             tile.structure = newDewsc;
             this.layer.enter(tile); // TODO refactor: dot definitely visible here
