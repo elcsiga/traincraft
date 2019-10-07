@@ -78,14 +78,14 @@ export class EditVehicle extends UiState {
         }
     }
 
-    click(w: ViewCoord, e: MouseEvent): void {
+    click(w: ViewCoord): void {
         if (this.cursor) {
-            if (!e.ctrlKey && !this.cursor.tile.vehicle) {
+            if (!this.canvas.isKeyPressed('Control') && !this.cursor.tile.vehicle) {
                 this.applyDef(this.cursor.tile, {
                     typeIndex: this.typeIndex,
                     placement: this.cursor.placement,
                 });
-            } else if (e.ctrlKey && this.cursor.tile.vehicle) {
+            } else if (!this.canvas.isKeyPressed('Control') && this.cursor.tile.vehicle) {
                 this.applyDef(this.cursor.tile, null);
             }
         }

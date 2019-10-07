@@ -1,6 +1,6 @@
 import { Layer } from '../layer';
 import { VisibleTile } from '../../canvas/canvas';
-import { tileWidth, tileHeight, MapCoord, HexDir } from '../../hex/hexGeo';
+import { tileWidth, tileHeight, MapCoord, HexDir, opposite } from '../../hex/hexGeo';
 
 import * as styles from './vehicle.scss';
 import { TileWithStructure } from '../structure/structure';
@@ -27,7 +27,13 @@ export interface VehiclePlacement {
 }
 
 export function getVehicleTransform(placement: VehiclePlacement): string {
-    return ''; //TODO
+    const f = opposite(placement.fromDir) * 60;
+    const t = placement.toDir * 60;
+
+
+    const a = (f + t) * .5;
+    return `rotate(${-a}deg)`;
+
 }
 
 export interface TileWithVehicle {

@@ -58,7 +58,7 @@ export class EditStructure extends UiState {
         return img;
     }
 
-    hover(w: ViewCoord, e: MouseEvent): void {
+    hover(w: ViewCoord): void {
         const m = toMap(w);
         this.resetHover();
         const tile1 = this.canvas.getSafeVisibleTile(m) as Tile;
@@ -66,7 +66,7 @@ export class EditStructure extends UiState {
             const dir: HexDir = getDir(m, w);
             const tile2 = this.canvas.getSafeVisibleTile(shift(m, dir)) as Tile;
             if (tile2) {
-                const connection = e && e.ctrlKey ? '_' : this.connection;
+                const connection = this.canvas.isKeyPressed('Control') ? '_' : this.connection;
 
                 const newDef1 = this.getNewDef(tile1, dir, connection);
                 const newDef2 = this.getNewDef(tile2, opposite(dir), connection);
@@ -103,9 +103,9 @@ export class EditStructure extends UiState {
         }
     }
 
-    click(w: ViewCoord, e: MouseEvent): void {
+    click(w: ViewCoord): void {
         if (this.cursor) {
-            const connection = e && e.ctrlKey ? '_' : this.connection;
+            const connection = this.canvas.isKeyPressed('Control') ? '_' : this.connection;
 
             const newDef1 = this.getNewDef(this.cursor.tile1, this.cursor.dir, connection);
             const newDef2 = this.getNewDef(this.cursor.tile2, opposite(this.cursor.dir), connection);

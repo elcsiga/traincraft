@@ -30,6 +30,7 @@ export class Canvas {
 
     private uiState: UiState = null;
     private panBase: { mousePos: ScreenCoord; offset: ScreenCoord } = null;
+    public keysPressed = new Set();
 
     private viewOffset: ScreenCoord = { sx: 0, sy: 0 };
     private zoom = 1;
@@ -47,7 +48,9 @@ export class Canvas {
         this.containerElement.appendChild(this.canvasElement);
 
         this.eventHandlers.forEach(e => this.containerElement.addEventListener(e.key, e.handler));
-        document.addEventListener('resize', this.handleResize);
+        window.addEventListener('resize', this.handleResize);
+        document.addEventListener('keyup', this.handleKeys);
+        document.addEventListener('keydown', this.handleKeys);
     }
 
     init(): void {
@@ -58,7 +61,9 @@ export class Canvas {
         this.uiState.disable();
 
         this.eventHandlers.forEach(e => this.containerElement.removeEventListener(e.key, e.handler));
-        document.removeEventListener('resize', this.handleResize);
+        window.removeEventListener('resize', this.handleResize);
+        document.removeEventListener('keyup', this.handleKeys);
+        document.removeEventListener('keydown', this.handleKeys);
 
         this.containerElement.remove();
     }
@@ -77,7 +82,7 @@ export class Canvas {
     private hover(e: MouseEvent): void {
         const w = this.screenToView(this.getMousePos(e));
         this.lastHoveredPosition = w;
-        this.uiState.hover(w, e);
+        this.uiState.hover(w);
     }
 
     private resetHover(): void {
@@ -172,7 +177,7 @@ export class Canvas {
             handler: (e: MouseEvent) => {
                 if (e.button === 0) {
                     const w = this.screenToView(this.getMousePos(e));
-                    this.uiState.click(w, e);
+                    this.uiState.click(w);
                 }
                 this.lastMousePos = this.getMousePos(e);
             },
@@ -205,8 +210,23 @@ export class Canvas {
     ];
 
     private handleResize: () => void = () => {
+        console.log('R');
         this.updateContainer();
     };
+    private handleKeys: (e: KeyboardEvent) => void = (e) => {
+        if (e.type === 'keydown' && !this.keysPressed.has(e.key)) {
+            this.keysPressed.add(e.key);
+            this.uiState.hover(this.lastHoveredPosition);
+        } else if (e.type === 'keyup' && this.keysPressed.has(e.key)) {
+            this.keysPressed.delete(e.key);
+            this.uiState.hover(this.lastHoveredPosition);
+        }
+
+    };
+
+    public isKeyPressed(k: string): boolean {
+        return this.keysPressed.has(k);
+    }
 
     /////////////
 
@@ -315,7 +335,7 @@ export class Canvas {
         this.uiState.enable();
 
         if (this.lastHoveredPosition) {
-            state.hover(this.lastHoveredPosition, null);
+            state.hover(this.lastHoveredPosition);
         }
     }
 }
