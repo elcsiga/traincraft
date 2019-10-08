@@ -45,6 +45,7 @@ export class EditVehicle extends UiState {
     resetHover(): void {
         if (this.cursor) {
             this.cursor.tile.canvas.containerElement.style.opacity = '1';
+            this.cursor = null;
         }
     }
 

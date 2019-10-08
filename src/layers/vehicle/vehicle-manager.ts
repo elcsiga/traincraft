@@ -1,7 +1,7 @@
 import { TileMap } from '../../hex/tileMap';
 import { TileWithStructure } from '../structure/structure';
 import { TileWithVehicle, VehiclePlacement, VehicleDef, VehicleLayer, VisibleTileWithVehicle } from './vehicle';
-import { shift, opposite } from '../../hex/hexGeo';
+import { shift, opposite, normalize } from '../../hex/hexGeo';
 import { structureTypes } from '../structure/structure-types';
 import { VisibleTile } from '../../canvas/canvas';
 
@@ -26,7 +26,9 @@ export class VehicleMaanager {
         const tile = this.map.getSafeTile(position);
         if (tile) {
             const fromDir = opposite(placement.toDir);
-            const toDir = structureTypes[tile.structure.index].next(fromDir);
+            const normalizedFromDir = normalize(fromDir + tile.structure.rotation);
+            
+            const toDir = normalize(structureTypes[tile.structure.index].next(normalizedFromDir) - tile.structure.rotation);
             if (toDir !== null) {
                 return { position, toDir, fromDir, tile };
             }

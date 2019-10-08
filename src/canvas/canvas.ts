@@ -212,8 +212,15 @@ export class Canvas {
     ];
 
     private handleResize: () => void = () => {
-        console.log('R');
         this.updateContainer();
+        this.render();
+
+        forachAreaCoord(this.getArea(), m => {
+            const tile = this.map.getSafeTile(m);
+            if (tile) {
+                this.updateTileTransorm(tile, m);
+            }
+        });
     };
     private handleKeys: (e: KeyboardEvent) => void = e => {
         if (e.type === 'keydown' && !this.keysPressed.has(e.key)) {
@@ -274,7 +281,7 @@ export class Canvas {
 
     render(): void {
         const area = this.getArea();
-        forachAreaCoord(this.getArea(), m => {
+        forachAreaCoord(area, m => {
             const tile = this.map.getSafeTile(m);
             if (tile) {
                 if (!tile.canvas) {
@@ -298,24 +305,32 @@ export class Canvas {
         this.previousMapArea = area;
     }
 
+    updateTileTransorm(tile: VisibleTile, m: MapCoord): void {
+        if (tile.canvas) {
+            const div = tile.canvas.containerElement;
+            const w = toView(m);
+    
+            const cx = this.rect.width / 2 - tileWidth / 2;
+            const cy = this.rect.height / 2 - tileHeight / 2;
+    
+            const tx = cx + w.wx;
+            const ty = cy - w.wy;
+            tile.canvas.containerElement.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
+        }
+
+    }
+
     enter(tile: VisibleTile, m: MapCoord): void {
-        const w = toView(m);
+
         const div = document.createElement('div');
         div.classList.add(styles.tile);
-
-        //TODO
-        const cx = this.rect.width / 2 - tileWidth / 2;
-        const cy = this.rect.height / 2 - tileHeight / 2;
-
-        const tx = cx + w.wx;
-        const ty = cy - w.wy;
-        div.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
-
         this.canvasElement.appendChild(div);
         tile.canvas = {
             containerElement: div,
             renderPhase: this.renderPhase,
         };
+
+        this.updateTileTransorm(tile, m);
 
         this.layers.forEach(layer => {
             layer.enter(tile, m);

@@ -16,6 +16,7 @@ export class EditTerrain extends UiState {
     resetHover(): void {
         if (this.cursorTile && this.cursorTile.canvas) {
             this.cursorTile.canvas.containerElement.style.opacity = '1';
+            this.cursorTile = null;
         }
     }
 

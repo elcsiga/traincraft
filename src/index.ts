@@ -43,7 +43,7 @@ const uiStates = [
     new EditVehicle(canvas, vehicleLayer, 0, vehicleManager),
     new EditVehicle(canvas, vehicleLayer, 1, vehicleManager),
 ];
-canvas.setUiState(uiStates[2]);
+canvas.setUiState(uiStates[4]);
 
 const demoCanvas = document.createElement('div');
 demoCanvas.classList.add(styles.demoCanvas);

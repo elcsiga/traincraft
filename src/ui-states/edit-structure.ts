@@ -32,6 +32,7 @@ export class EditStructure extends UiState {
         if (this.cursor) {
             if (this.cursor.overlay1) this.cursor.overlay1.remove();
             if (this.cursor.overlay2) this.cursor.overlay2.remove();
+            this.cursor = null;
         }
     }
 
