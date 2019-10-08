@@ -49,12 +49,11 @@ export class EditStructure extends UiState {
         img.height = tileHeight;
         img.classList.add(styles.structireCursor);
 
-        if (def) {
-            const type = structureTypes[def.index];
-            const rotation = def.rotation;
-            img.src = type.image;
-            img.style.transform = `rotate(${rotation * 60 + 180}deg)`;
-        }
+        const type = structureTypes[def.index];
+        const rotation = def.rotation;
+        img.src = type.image;
+        img.style.transform = `rotate(${rotation * 60 + 180}deg)`;
+
         return img;
     }
 
@@ -72,11 +71,14 @@ export class EditStructure extends UiState {
                 const newDef2 = this.getNewDef(tile2, opposite(dir), connection);
 
                 if (newDef1 !== false && newDef2 !== false) {
-                    const overlay1 = this.getOverlayImage(newDef1);
-                    const overlay2 = this.getOverlayImage(newDef2);
 
-                    tile1.canvas.containerElement.appendChild(overlay1);
-                    tile2.canvas.containerElement.appendChild(overlay2);
+                    const overlay1 = newDef1 ? this.getOverlayImage(newDef1) : null;
+                    const overlay2 = newDef2 ? this.getOverlayImage(newDef2) : null;
+
+                    if (overlay1)
+                        tile1.canvas.containerElement.appendChild(overlay1);
+                    if (overlay2)
+                        tile2.canvas.containerElement.appendChild(overlay2);
 
                     this.cursor = { tile1, tile2, dir, overlay1, overlay2 };
                 }
