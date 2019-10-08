@@ -9,6 +9,7 @@ import { StructureLayer, TileWithStructure } from './layers/structure/structure'
 import { distance } from './hex/hexGeo';
 import { EditVehicle } from './ui-states/edit-vehicle';
 import { VehicleLayer } from './layers/vehicle/vehicle';
+import { VehicleMaanager, Tile as VehicleManagerTile } from './layers/vehicle/vehicle-manager';
 
 const MAP_SIZE = 10;
 type TrainCraftTile = VisibleTile & TileWithTerrain & TileWithStructure;
@@ -32,13 +33,15 @@ const vehicleLayer = new VehicleLayer();
 const laywers: Layer[] = [terrainLayer, structureLayer, vehicleLayer];
 const canvas = new Canvas(map, laywers);
 
+const vehicleManager = new VehicleMaanager(map as TileMap<VehicleManagerTile>, vehicleLayer);
+
 const uiStates = [
     new EditTerrain(canvas, terrainLayer, 'empty'),
     new EditTerrain(canvas, terrainLayer, 'water'),
     new EditStructure(canvas, structureLayer, 'R'),
     new EditStructure(canvas, structureLayer, 'S'),
-    new EditVehicle(canvas, vehicleLayer, 0),
-    new EditVehicle(canvas, vehicleLayer, 1),
+    new EditVehicle(canvas, vehicleLayer, 0, vehicleManager),
+    new EditVehicle(canvas, vehicleLayer, 1, vehicleManager),
 ];
 canvas.setUiState(uiStates[2]);
 
@@ -59,4 +62,5 @@ document.addEventListener('keypress', e => {
     if (e.key == '6') canvas.setUiState(uiStates[5]);
 
     if (e.key == 's') map.save();
+    if (e.key == ' ') vehicleManager.stepAll();
 });

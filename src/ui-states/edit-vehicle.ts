@@ -10,6 +10,7 @@ import {
     VehicleLayer,
     VehiclePlacement,
 } from '../layers/vehicle/vehicle';
+import { VehicleMaanager } from '../layers/vehicle/vehicle-manager';
 
 type Tile = VisibleTile & TileWithStructure & TileWithVehicle & VisibleTileWithVehicle;
 
@@ -32,7 +33,12 @@ interface VehicleCursor {
 export class EditVehicle extends UiState {
     cursor: VehicleCursor;
 
-    constructor(private canvas: Canvas, private layer: VehicleLayer, private typeIndex: number) {
+    constructor(
+        private canvas: Canvas,
+        private layer: VehicleLayer,
+        private typeIndex: number,
+        private manager: VehicleMaanager,
+    ) {
         super();
     }
 
@@ -68,17 +74,16 @@ export class EditVehicle extends UiState {
     private applyDef(tile: Tile, newDewsc: VehicleDef): void {
         if (!tile.vehicle && newDewsc) {
             tile.vehicle = newDewsc;
-            this.layer.enter(tile); // TODO refactor: dot definitely visible here
-        } else if (tile.vehicle && newDewsc) {
-            tile.vehicle = newDewsc;
-            this.layer.update(tile);
+            this.layer.enter(tile);
+            this.manager.add(newDewsc);
         } else if (tile.vehicle && !newDewsc) {
+            this.manager.remove(tile.vehicle);
             this.layer.exit(tile);
             delete tile.vehicle;
         }
     }
 
-    click(w: ViewCoord): void {
+    click(): void {
         if (this.cursor) {
             if (!this.canvas.isKeyPressed('Control') && !this.cursor.tile.vehicle) {
                 this.applyDef(this.cursor.tile, {

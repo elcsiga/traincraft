@@ -24,7 +24,7 @@ export interface VisibleTileWithStructure {
 
 export class StructureLayer extends Layer {
     enter(tile: Tile): void {
-        if (tile.structure) {
+        if (tile.structure && tile.canvas) {
             const img = document.createElement('img');
             img.width = tileWidth;
             img.height = tileHeight;
@@ -37,14 +37,16 @@ export class StructureLayer extends Layer {
         }
     }
     update(tile: Tile): void {
-        const type = structureTypes[tile.structure.index];
-        const element = tile.canvas._structureElement;
-        const rotation = tile.structure.rotation;
-        element.src = type.image;
-        element.style.transform = `rotate(${rotation * 60 + 180}deg)`;
+        if (tile.structure && tile.canvas) {
+            const type = structureTypes[tile.structure.index];
+            const element = tile.canvas._structureElement;
+            const rotation = tile.structure.rotation;
+            element.src = type.image;
+            element.style.transform = `rotate(${rotation * 60 + 180}deg)`;
+        }
     }
     exit(tile: Tile): void {
-        if (tile.structure) {
+        if (tile.structure && tile.canvas) {
             tile.canvas._structureElement.remove();
             delete tile.canvas._structureElement;
         }

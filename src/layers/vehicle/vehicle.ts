@@ -3,7 +3,6 @@ import { VisibleTile } from '../../canvas/canvas';
 import { tileWidth, tileHeight, MapCoord, HexDir, opposite } from '../../hex/hexGeo';
 
 import * as styles from './vehicle.scss';
-import { TileWithStructure } from '../structure/structure';
 import { vehicleTypes } from './vehicle-types';
 
 //////////////////////
@@ -23,17 +22,15 @@ export interface VehiclePlacement {
     position: MapCoord;
     toDir: HexDir;
     fromDir: HexDir;
-    tile: TileWithStructure;
+    tile: VisibleTile & TileWithVehicle;
 }
 
 export function getVehicleTransform(placement: VehiclePlacement): string {
     const f = opposite(placement.fromDir) * 60;
     const t = placement.toDir * 60;
 
-
-    const a = (f + t) * .5;
+    const a = (f + t) * 0.5;
     return `rotate(${-a}deg)`;
-
 }
 
 export interface TileWithVehicle {
@@ -47,7 +44,7 @@ export interface VisibleTileWithVehicle {
 
 export class VehicleLayer extends Layer {
     enter(tile: Tile): void {
-        if (tile.vehicle) {
+        if (tile.canvas && tile.vehicle) {
             const img = document.createElement('img');
             img.width = tileWidth;
             img.height = tileHeight;
@@ -60,13 +57,15 @@ export class VehicleLayer extends Layer {
         }
     }
     update(tile: Tile): void {
-        const type = vehicleTypes[tile.vehicle.typeIndex];
-        const element = tile.canvas._vehicleElement;
-        element.src = type.image;
-        element.style.transform = getVehicleTransform(tile.vehicle.placement);
+        if (tile.vehicle && tile.canvas) {
+            const type = vehicleTypes[tile.vehicle.typeIndex];
+            const element = tile.canvas._vehicleElement;
+            element.src = type.image;
+            element.style.transform = getVehicleTransform(tile.vehicle.placement);
+        }
     }
     exit(tile: Tile): void {
-        if (tile.vehicle) {
+        if (tile.vehicle && tile.canvas) {
             tile.canvas._vehicleElement.remove();
             delete tile.canvas._vehicleElement;
         }

@@ -36,7 +36,7 @@ export class TerrainLayer extends Layer {
         }
     }
     enter(tile: Tile): void {
-        if (tile.terrain) {
+        if (tile.terrain && tile.canvas) {
             const img = document.createElement('img');
             img.width = tileWidth;
             img.height = tileHeight;
@@ -47,10 +47,12 @@ export class TerrainLayer extends Layer {
         }
     }
     update(tile: Tile): void {
-        tile.canvas.terrainElement.src = this.getBackgroundImage(tile);
+        if (tile.terrain && tile.canvas) {
+            tile.canvas.terrainElement.src = this.getBackgroundImage(tile);
+        }
     }
     exit(tile: Tile): void {
-        if (tile.terrain) {
+        if (tile.terrain && tile.canvas) {
             tile.canvas.terrainElement.remove();
             delete tile.canvas.terrainElement;
         }

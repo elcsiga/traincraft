@@ -215,7 +215,7 @@ export class Canvas {
         console.log('R');
         this.updateContainer();
     };
-    private handleKeys: (e: KeyboardEvent) => void = (e) => {
+    private handleKeys: (e: KeyboardEvent) => void = e => {
         if (e.type === 'keydown' && !this.keysPressed.has(e.key)) {
             this.keysPressed.add(e.key);
             this.uiState.hover(this.lastHoveredPosition);
@@ -223,7 +223,6 @@ export class Canvas {
             this.keysPressed.delete(e.key);
             this.uiState.hover(this.lastHoveredPosition);
         }
-
     };
 
     public isKeyPressed(k: string): boolean {
@@ -259,7 +258,7 @@ export class Canvas {
             top: rect.top,
             left: rect.left,
             width: this.containerElement.offsetWidth,
-            height: this.containerElement.offsetHeight
+            height: this.containerElement.offsetHeight,
         };
 
         this.updateTransform();

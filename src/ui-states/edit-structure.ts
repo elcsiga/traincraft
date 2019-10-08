@@ -71,14 +71,11 @@ export class EditStructure extends UiState {
                 const newDef2 = this.getNewDef(tile2, opposite(dir), connection);
 
                 if (newDef1 !== false && newDef2 !== false) {
-
                     const overlay1 = newDef1 ? this.getOverlayImage(newDef1) : null;
                     const overlay2 = newDef2 ? this.getOverlayImage(newDef2) : null;
 
-                    if (overlay1)
-                        tile1.canvas.containerElement.appendChild(overlay1);
-                    if (overlay2)
-                        tile2.canvas.containerElement.appendChild(overlay2);
+                    if (overlay1) tile1.canvas.containerElement.appendChild(overlay1);
+                    if (overlay2) tile2.canvas.containerElement.appendChild(overlay2);
 
                     this.cursor = { tile1, tile2, dir, overlay1, overlay2 };
                 }
@@ -105,7 +102,7 @@ export class EditStructure extends UiState {
         }
     }
 
-    click(w: ViewCoord): void {
+    click(): void {
         if (this.cursor) {
             const connection = this.canvas.isKeyPressed('Control') ? '_' : this.connection;
 
