@@ -21,10 +21,12 @@ export class Canvas {
     private containerElement: HTMLElement;
     private canvasElement: HTMLElement;
 
-    private width: number;
-    private height: number;
-    private top: number;
-    private left: number;
+    private rect: {
+        width: number;
+        height: number;
+        top: number;
+        left: number;
+    };
 
     private lastHoveredPosition: ViewCoord = null;
 
@@ -104,14 +106,14 @@ export class Canvas {
         return {
             tl: toMap(
                 this.screenToView({
-                    sx: -this.width / 2 - areaOffset.sx,
-                    sy: this.height / 2 + areaOffset.sy,
+                    sx: -this.rect.width / 2 - areaOffset.sx,
+                    sy: this.rect.height / 2 + areaOffset.sy,
                 }),
             ),
             br: toMap(
                 this.screenToView({
-                    sx: this.width / 2 + areaOffset.sx,
-                    sy: -this.height / 2 - areaOffset.sy,
+                    sx: this.rect.width / 2 + areaOffset.sx,
+                    sy: -this.rect.height / 2 - areaOffset.sy,
                 }),
             ),
         };
@@ -232,8 +234,8 @@ export class Canvas {
 
     private getMousePos(e: MouseEvent): ScreenCoord {
         return {
-            sx: e.clientX - this.left - this.width / 2,
-            sy: this.height / 2 + this.top - e.clientY,
+            sx: e.clientX - this.rect.left - this.rect.width / 2,
+            sy: this.rect.height / 2 + this.rect.top - e.clientY,
         };
     }
 
@@ -252,11 +254,14 @@ export class Canvas {
     }
 
     private updateContainer(): void {
-        this.width = this.containerElement.offsetWidth;
-        this.height = this.containerElement.offsetHeight;
         const rect = this.containerElement.getBoundingClientRect();
-        this.top = rect.top;
-        this.left = rect.left;
+        this.rect = {
+            top: rect.top,
+            left: rect.left,
+            width: this.containerElement.offsetWidth,
+            height: this.containerElement.offsetHeight
+        };
+
         this.updateTransform();
         this.render();
     }
@@ -300,8 +305,8 @@ export class Canvas {
         div.classList.add(styles.tile);
 
         //TODO
-        const cx = this.width / 2 - tileWidth / 2;
-        const cy = this.height / 2 - tileHeight / 2;
+        const cx = this.rect.width / 2 - tileWidth / 2;
+        const cy = this.rect.height / 2 - tileHeight / 2;
 
         const tx = cx + w.wx;
         const ty = cy - w.wy;
