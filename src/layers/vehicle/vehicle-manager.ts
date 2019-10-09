@@ -27,9 +27,10 @@ export class VehicleMaanager {
         if (tile) {
             const fromDir = opposite(placement.toDir);
             const normalizedFromDir = normalize(fromDir + tile.structure.rotation);
-            
+
             const toDir = normalize(structureTypes[tile.structure.index].next(normalizedFromDir) - tile.structure.rotation);
             if (toDir !== null) {
+                console.log('NEXT', fromDir, normalizedFromDir, toDir );
                 return { position, toDir, fromDir, tile };
             }
         }

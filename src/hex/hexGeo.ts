@@ -33,7 +33,7 @@ export function shift(m: MapCoord, dir: HexDir): MapCoord {
 }
 
 export function normalize(d: HexDir): HexDir {
-    return d < 0 ? d + 6 : d;
+    return d < 0 ? d + 6 : d >= 6 ? d - 6 : d;
 }
 
 export function opposite(d: HexDir): HexDir {
