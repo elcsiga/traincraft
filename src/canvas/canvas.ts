@@ -225,10 +225,12 @@ export class Canvas {
     private handleKeys: (e: KeyboardEvent) => void = e => {
         if (e.type === 'keydown' && !this.keysPressed.has(e.key)) {
             this.keysPressed.add(e.key);
-            this.uiState.hover(this.lastHoveredPosition);
+            if (this.lastHoveredPosition)
+                this.uiState.hover(this.lastHoveredPosition);
         } else if (e.type === 'keyup' && this.keysPressed.has(e.key)) {
             this.keysPressed.delete(e.key);
-            this.uiState.hover(this.lastHoveredPosition);
+            if (this.lastHoveredPosition)
+                this.uiState.hover(this.lastHoveredPosition);
         }
     };
 

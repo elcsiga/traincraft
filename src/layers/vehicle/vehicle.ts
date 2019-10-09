@@ -22,7 +22,6 @@ export interface VehiclePlacement {
     position: MapCoord;
     toDir: HexDir;
     fromDir: HexDir;
-    tile: VisibleTile & TileWithVehicle;
 }
 
 export function getVehicleTransform(placement: VehiclePlacement): string {
@@ -30,7 +29,7 @@ export function getVehicleTransform(placement: VehiclePlacement): string {
     const t = placement.toDir * 60;
 
     const a = (f + t) * 0.5;
-    return Math.abs(f - t) < 180 ? `rotate(${-a}deg)` : `rotate(${160-a}deg)`;
+    return Math.abs(f - t) < 180 ? `rotate(${-a}deg)` : `rotate(${180-a}deg)`;
 }
 
 export interface TileWithVehicle {

@@ -26,6 +26,18 @@ export class TileMap<T> {
         }
     }
 
+    forEachSafeTile(f: (t: T) => void): void {
+        const arrayLength = this.size * 2 + 1;
+        for (let x = 0; x < arrayLength; x++) {
+            for (let y = 0; y < arrayLength; y++) {
+                const t = this.map[x][y];
+                if (t) {
+                    f(t);
+                }
+            }
+        }
+    }
+
     getTile(m: MapCoord): T {
         return this.map[m.x + this.size][m.y + this.size];
     }

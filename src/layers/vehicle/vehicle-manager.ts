@@ -5,62 +5,84 @@ import { shift, opposite, normalize } from '../../hex/hexGeo';
 import { structureTypes } from '../structure/structure-types';
 import { VisibleTile } from '../../canvas/canvas';
 
+
+
 export type Tile = VisibleTile & TileWithStructure & TileWithVehicle & VisibleTileWithVehicle;
+interface PlacementWithTile {
+    placement: VehiclePlacement;
+    tile: Tile;
+}
+
 export class VehicleMaanager {
-    private vehicles: VehicleDef[] = [];
+    private tilesWithVehicles: Tile[] = [];
 
-    constructor(private map: TileMap<Tile>, private layer: VehicleLayer) {}
-
-    add(vehicle: VehicleDef): void {
-        this.vehicles.push(vehicle);
+    constructor(
+        private map: TileMap<Tile>,
+        private layer: VehicleLayer
+    ) {
+        this.init();
     }
-    remove(vehicle: VehicleDef): void {
-        const index = this.vehicles.indexOf(vehicle);
+
+    add(tilesWithVehicle: TileWithVehicle): void {
+        this.tilesWithVehicles.push(tilesWithVehicle as Tile);
+    }
+    remove(tilesWithVehicle: TileWithVehicle): void {
+        const index = this.tilesWithVehicles.indexOf(tilesWithVehicle as Tile);
         if (index > -1) {
-            this.vehicles.splice(index, 1);
+            this.tilesWithVehicles.splice(index, 1);
         }
     }
 
-    getNextPlacement(placement: VehiclePlacement): VehiclePlacement {
+    init() {
+        this.tilesWithVehicles = [];
+        this.map.forEachSafeTile( tile => {
+            if (tile.vehicle) {
+                this.tilesWithVehicles.push(tile);
+            }
+        })
+    }
+
+    getNextPlacement(placement: VehiclePlacement): PlacementWithTile {
         const position = shift(placement.position, placement.toDir);
         const tile = this.map.getSafeTile(position);
         if (tile) {
             const fromDir = opposite(placement.toDir);
             const normalizedFromDir = normalize(fromDir + tile.structure.rotation);
 
-            const toDir = normalize(structureTypes[tile.structure.index].next(normalizedFromDir) - tile.structure.rotation);
-            if (toDir !== null) {
-                console.log('NEXT', fromDir, normalizedFromDir, toDir );
-                return { position, toDir, fromDir, tile };
+            const normalizedToDir = structureTypes[tile.structure.index].next(normalizedFromDir);
+            if (normalizedToDir !== null) {
+                const toDir = normalize(normalizedToDir - tile.structure.rotation);
+                const placement: VehiclePlacement = { position, toDir, fromDir };
+                return { placement, tile };
             }
         }
         return null;
     }
 
-    isTileFree(placement: VehiclePlacement): boolean {
-        return !placement.tile.vehicle;
-    }
+    step(tilesWithVehicle: Tile): Tile {
+        const nextPlacementWithTile = this.getNextPlacement(tilesWithVehicle.vehicle.placement);
+        if (nextPlacementWithTile && !nextPlacementWithTile.tile.vehicle) {
+            const nextTile = nextPlacementWithTile.tile;
+            const vehicle = tilesWithVehicle.vehicle;
 
-    step(vehicle: VehicleDef): boolean {
-        const nextPlacement = this.getNextPlacement(vehicle.placement);
-        if (nextPlacement && this.isTileFree(nextPlacement)) {
-            const currentTile = vehicle.placement.tile as Tile;
-            const nextTile = nextPlacement.tile as Tile;
+            this.layer.exit(tilesWithVehicle);
+            delete tilesWithVehicle.vehicle;
 
-            this.layer.exit(currentTile);
-            delete currentTile.vehicle;
-
-            nextPlacement.tile = nextTile;
-            vehicle.placement = nextPlacement;
+            vehicle.placement = nextPlacementWithTile.placement;
 
             nextTile.vehicle = vehicle;
             this.layer.enter(nextTile);
 
-            return true;
-        } else return false;
+            return nextTile;
+        } else return null;
     }
 
     stepAll(): void {
-        this.vehicles.forEach(v => this.step(v));
+        this.tilesWithVehicles.forEach((v, i) => {
+            const newTile = this.step(v);
+            if (newTile) {
+                this.tilesWithVehicles[i] = newTile;
+            }
+        });
     }
 }

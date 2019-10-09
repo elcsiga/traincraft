@@ -58,7 +58,7 @@ export const structureTypes: StructureType[] = [
         image: switchLeftRail,
         connections: 'R_R__R',
         rotations: 6,
-        next: p => (p === 2 ? 0 : 2),
+        next: p => (p === 2 ? 5 : 2),
     },
     {
         image: crossRail,
@@ -107,14 +107,14 @@ export const structureTypes: StructureType[] = [
         rotations: 6,
         next: p => {
             switch (p) {
+                case 2:
+                    return 5;
+                case 5:
+                    return 2;
                 case 0:
                     return 3;
                 case 3:
                     return 0;
-                case 1:
-                    return 4;
-                case 4:
-                    return 1;
             }
         },
     },
@@ -124,10 +124,10 @@ export const structureTypes: StructureType[] = [
         rotations: 6,
         next: p => {
             switch (p) {
-                case 0:
-                    return 3;
-                case 3:
-                    return 0;
+                case 2:
+                    return 5;
+                case 5:
+                    return 2;
                 case 1:
                     return 4;
                 case 4:

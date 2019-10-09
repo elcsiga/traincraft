@@ -22,7 +22,7 @@ export function getInitialVehiclePlacement(position: MapCoord, tile: Tile, conne
         const toDir: HexDir = connections.indexOf(connection, fromDir + 1);
         if (toDir < 0) return null; // less than 2 connections
         if (connections.indexOf(connection, toDir + 1) >= 0) return null; // more than 2 connections
-        return { position, fromDir, toDir, tile };
+        return { position, fromDir, toDir };
     }
 }
 
@@ -76,9 +76,9 @@ export class EditVehicle extends UiState {
         if (!tile.vehicle && newDewsc) {
             tile.vehicle = newDewsc;
             this.layer.enter(tile);
-            this.manager.add(newDewsc);
+            this.manager.add(tile);
         } else if (tile.vehicle && !newDewsc) {
-            this.manager.remove(tile.vehicle);
+            this.manager.remove(tile);
             this.layer.exit(tile);
             delete tile.vehicle;
         }
