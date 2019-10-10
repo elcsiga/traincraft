@@ -10,6 +10,7 @@ module.exports =  {
       sourceType:  'module',  // Allows for the use of imports
     },
     rules: {
-      "@typescript-eslint/explicit-function-return-type": ['warn', { allowExpressions: true } ]
+      "@typescript-eslint/explicit-function-return-type": ['warn', { allowExpressions: true } ],
+      "@typescript-eslint/no-unused-vars": ['error', { "ignoreRestSiblings": true } ]
     },
   };

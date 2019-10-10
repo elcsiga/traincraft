@@ -63,7 +63,7 @@ export class TileMap<T> {
     }
 
     save(): void {
-        const clone: any[][] = [];
+        const clone: unknown[][] = [];
         const arrayLength = this.size * 2 + 1;
         for (let x = 0; x < arrayLength; x++) {
             clone[x] = [];

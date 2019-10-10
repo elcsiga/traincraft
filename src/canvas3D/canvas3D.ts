@@ -5,12 +5,12 @@ import * as styles from './canvas3D.scss';
 export class Canvas3D {
     private containerElement: HTMLElement;
 
-    private camera: any; //: PerspectiveCamera;
-    private scene: any; //: Scene;
-    private renderer: any; //: WebGLRenderer;
-    private geometry: any; //: BoxGeometry;
-    private material: any; //: MeshNormalMaterial;
-    private mesh: any; //: Mesh;
+    private camera: PerspectiveCamera;
+    private scene: Scene;
+    private renderer: WebGLRenderer;
+    private geometry: BoxGeometry;
+    private material: MeshNormalMaterial;
+    private mesh: Mesh;
 
     constructor() {
         this.containerElement = document.createElement('div');
@@ -20,7 +20,7 @@ export class Canvas3D {
         this.animate();
     }
 
-    init() {
+    init(): void {
         this.camera = new PerspectiveCamera(70, 100 / 100, 0.01, 10);
         this.camera.position.z = 1;
 
@@ -37,7 +37,7 @@ export class Canvas3D {
         this.containerElement.appendChild(this.renderer.domElement);
     }
 
-    animate = () => {
+    animate = (): void => {
         requestAnimationFrame(this.animate);
         this.mesh.rotation.x += 0.01;
         this.mesh.rotation.y += 0.02;
