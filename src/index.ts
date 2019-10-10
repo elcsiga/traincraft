@@ -10,6 +10,7 @@ import { distance } from './hex/hexGeo';
 import { EditVehicle } from './ui-states/edit-vehicle';
 import { VehicleLayer } from './layers/vehicle/vehicle';
 import { VehicleMaanager, Tile as VehicleManagerTile } from './layers/vehicle/vehicle-manager';
+import { Canvas3D } from './canvas3D/canvas3D';
 
 const MAP_SIZE = 10;
 type TrainCraftTile = VisibleTile & TileWithTerrain & TileWithStructure;
@@ -45,11 +46,11 @@ const uiStates = [
 ];
 canvas.setUiState(uiStates[4]);
 
-const demoCanvas = document.createElement('div');
-demoCanvas.classList.add(styles.demoCanvas);
-demoCanvas.appendChild(canvas.getElement());
+const canvasContainerElement = document.createElement('div');
+canvasContainerElement.classList.add(styles.demoCanvas);
+canvasContainerElement.appendChild(canvas.getElement());
 
-document.body.appendChild(demoCanvas);
+document.body.appendChild(canvasContainerElement);
 canvas.init();
 
 document.addEventListener('keypress', e => {
@@ -64,3 +65,11 @@ document.addEventListener('keypress', e => {
     if (e.key == 's') map.save();
     if (e.key == ' ') vehicleManager.stepAll();
 });
+
+///
+
+const canvas3D = new Canvas3D();
+const canvas3DContainerElement = document.createElement('div');
+canvas3DContainerElement.classList.add(styles.canvas3D);
+canvas3DContainerElement.appendChild(canvas3D.getElement());
+document.body.appendChild(canvas3DContainerElement);

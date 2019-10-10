@@ -225,12 +225,10 @@ export class Canvas {
     private handleKeys: (e: KeyboardEvent) => void = e => {
         if (e.type === 'keydown' && !this.keysPressed.has(e.key)) {
             this.keysPressed.add(e.key);
-            if (this.lastHoveredPosition)
-                this.uiState.hover(this.lastHoveredPosition);
+            if (this.lastHoveredPosition) this.uiState.hover(this.lastHoveredPosition);
         } else if (e.type === 'keyup' && this.keysPressed.has(e.key)) {
             this.keysPressed.delete(e.key);
-            if (this.lastHoveredPosition)
-                this.uiState.hover(this.lastHoveredPosition);
+            if (this.lastHoveredPosition) this.uiState.hover(this.lastHoveredPosition);
         }
     };
 
@@ -309,21 +307,18 @@ export class Canvas {
 
     updateTileTransorm(tile: VisibleTile, m: MapCoord): void {
         if (tile.canvas) {
-            const div = tile.canvas.containerElement;
             const w = toView(m);
-    
+
             const cx = this.rect.width / 2 - tileWidth / 2;
             const cy = this.rect.height / 2 - tileHeight / 2;
-    
+
             const tx = cx + w.wx;
             const ty = cy - w.wy;
             tile.canvas.containerElement.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
         }
-
     }
 
     enter(tile: VisibleTile, m: MapCoord): void {
-
         const div = document.createElement('div');
         div.classList.add(styles.tile);
         this.canvasElement.appendChild(div);

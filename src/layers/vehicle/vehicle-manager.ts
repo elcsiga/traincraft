@@ -1,11 +1,9 @@
 import { TileMap } from '../../hex/tileMap';
 import { TileWithStructure } from '../structure/structure';
-import { TileWithVehicle, VehiclePlacement, VehicleDef, VehicleLayer, VisibleTileWithVehicle } from './vehicle';
+import { TileWithVehicle, VehiclePlacement, VehicleLayer, VisibleTileWithVehicle } from './vehicle';
 import { shift, opposite, normalize } from '../../hex/hexGeo';
 import { structureTypes } from '../structure/structure-types';
 import { VisibleTile } from '../../canvas/canvas';
-
-
 
 export type Tile = VisibleTile & TileWithStructure & TileWithVehicle & VisibleTileWithVehicle;
 interface PlacementWithTile {
@@ -16,10 +14,7 @@ interface PlacementWithTile {
 export class VehicleMaanager {
     private tilesWithVehicles: Tile[] = [];
 
-    constructor(
-        private map: TileMap<Tile>,
-        private layer: VehicleLayer
-    ) {
+    constructor(private map: TileMap<Tile>, private layer: VehicleLayer) {
         this.init();
     }
 
@@ -33,13 +28,13 @@ export class VehicleMaanager {
         }
     }
 
-    init() {
+    init(): void {
         this.tilesWithVehicles = [];
-        this.map.forEachSafeTile( tile => {
+        this.map.forEachSafeTile(tile => {
             if (tile.vehicle) {
                 this.tilesWithVehicles.push(tile);
             }
-        })
+        });
     }
 
     getNextPlacement(placement: VehiclePlacement): PlacementWithTile {
