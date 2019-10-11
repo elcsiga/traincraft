@@ -1,8 +1,9 @@
 import * as styles from './canvas.scss';
-import { toView, ViewCoord, tileWidth, tileHeight, toMap, MapCoord, MapArea, forachAreaCoord } from '../hex/hexGeo';
+import { ViewCoord, tileWidth, tileHeight, toMap, MapCoord, MapArea, forEachAreaCoord } from '../hex/hexGeo';
 import { TileMap } from '../hex/tileMap';
 import { UiState } from '../ui-states/shared';
 import { Layer } from '../layers/layer';
+import { DOMRenderer } from './DOMRenderer/DOMRenderer';
 
 export interface VisibleTile {
     canvas?: {
@@ -11,17 +12,17 @@ export interface VisibleTile {
     };
 }
 
-interface ScreenCoord {
+export interface ScreenCoord {
     sx: number;
     sy: number;
 }
 export type RnderPhase = 1 | 2;
 
 export class Canvas {
+    private renderer = new DOMRenderer(this);
     private containerElement: HTMLElement;
-    private canvasElement: HTMLElement;
 
-    private rect: {
+    rect: {
         width: number;
         height: number;
         top: number;
@@ -43,11 +44,9 @@ export class Canvas {
     private lastMousePos: ScreenCoord = null;
 
     constructor(private map: TileMap<VisibleTile>, private layers: Layer[]) {
-        this.canvasElement = document.createElement('div');
-        this.canvasElement.classList.add(styles.canvas);
         this.containerElement = document.createElement('div');
         this.containerElement.classList.add(styles.container);
-        this.containerElement.appendChild(this.canvasElement);
+        this.containerElement.appendChild(this.renderer.canvasElement);
 
         this.eventHandlers.forEach(e => this.containerElement.addEventListener(e.key, e.handler));
         window.addEventListener('resize', this.handleResize);
@@ -215,20 +214,25 @@ export class Canvas {
         this.updateContainer();
         this.render();
 
-        forachAreaCoord(this.getArea(), m => {
+        forEachAreaCoord(this.getArea(), m => {
             const tile = this.map.getSafeTile(m);
             if (tile) {
-                this.updateTileTransorm(tile, m);
+                this.renderer.setTileTransform(tile, m);
             }
         });
     };
+
     private handleKeys: (e: KeyboardEvent) => void = e => {
         if (e.type === 'keydown' && !this.keysPressed.has(e.key)) {
             this.keysPressed.add(e.key);
-            if (this.lastHoveredPosition) this.uiState.hover(this.lastHoveredPosition);
+            if (this.lastHoveredPosition) {
+                this.uiState.hover(this.lastHoveredPosition);
+            }
         } else if (e.type === 'keyup' && this.keysPressed.has(e.key)) {
             this.keysPressed.delete(e.key);
-            if (this.lastHoveredPosition) this.uiState.hover(this.lastHoveredPosition);
+            if (this.lastHoveredPosition) {
+                this.uiState.hover(this.lastHoveredPosition);
+            }
         }
     };
 
@@ -273,15 +277,12 @@ export class Canvas {
     }
 
     private updateTransform(): void {
-        const tx = this.viewOffset.sx;
-        const ty = -this.viewOffset.sy;
-        const z = this.zoom;
-        this.canvasElement.style.transform = `translate(${tx}px, ${ty}px) scale(${z}, ${z})`;
+        this.renderer.updateTransform(this.viewOffset, this.zoom);
     }
 
     render(): void {
         const area = this.getArea();
-        forachAreaCoord(area, m => {
+        forEachAreaCoord(area, m => {
             const tile = this.map.getSafeTile(m);
             if (tile) {
                 if (!tile.canvas) {
@@ -293,7 +294,7 @@ export class Canvas {
         });
 
         if (this.previousMapArea) {
-            forachAreaCoord(this.previousMapArea, m => {
+            forEachAreaCoord(this.previousMapArea, m => {
                 const tile = this.getSafeVisibleTile(m);
                 if (tile && tile.canvas.renderPhase !== this.renderPhase) {
                     this.exit(tile, m);
@@ -305,29 +306,14 @@ export class Canvas {
         this.previousMapArea = area;
     }
 
-    updateTileTransorm(tile: VisibleTile, m: MapCoord): void {
-        if (tile.canvas) {
-            const w = toView(m);
-
-            const cx = this.rect.width / 2 - tileWidth / 2;
-            const cy = this.rect.height / 2 - tileHeight / 2;
-
-            const tx = cx + w.wx;
-            const ty = cy - w.wy;
-            tile.canvas.containerElement.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
-        }
-    }
-
     enter(tile: VisibleTile, m: MapCoord): void {
-        const div = document.createElement('div');
-        div.classList.add(styles.tile);
-        this.canvasElement.appendChild(div);
+        const container = this.renderer.createNewTileContainer();
         tile.canvas = {
-            containerElement: div,
+            containerElement: container,
             renderPhase: this.renderPhase,
         };
 
-        this.updateTileTransorm(tile, m);
+        this.renderer.setTileTransform(tile, m);
 
         this.layers.forEach(layer => {
             layer.enter(tile, m);
@@ -338,7 +324,7 @@ export class Canvas {
         this.layers.forEach(layer => {
             layer.exit(tile, m);
         });
-        tile.canvas.containerElement.remove();
+        this.renderer.removeTileContainer(tile);
         delete tile.canvas;
     }
 

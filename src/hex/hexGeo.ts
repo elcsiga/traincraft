@@ -80,7 +80,7 @@ export const getDir: (m: MapCoord, w: ViewCoord) => HexDir = (m, w) => {
     return normalize(d);
 };
 
-export function forachAreaCoord(area: MapArea, f: (p: MapCoord) => void): void {
+export function forEachAreaCoord(area: MapArea, f: (p: MapCoord) => void): void {
     for (let y = area.br.y; y <= area.tl.y; y++) {
         const tlOffset = Math.floor((area.tl.y - y) / 2);
         const brOffset = Math.floor((y - area.br.y) / 2);

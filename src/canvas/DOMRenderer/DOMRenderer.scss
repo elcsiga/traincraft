@@ -1,0 +1,10 @@
+.canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.tile {
+    position: absolute;
+    transition: opacity .1s ease-in-out;
+}
