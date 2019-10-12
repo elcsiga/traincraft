@@ -70,10 +70,10 @@ export const structureTypes: StructureType[] = [
                     return 3;
                 case 3:
                     return 0;
-                case 1:
-                    return 4;
-                case 4:
-                    return 1;
+                case 2:
+                    return 5;
+                case 5:
+                    return 2;
             }
         },
     },

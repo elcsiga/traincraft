@@ -69,7 +69,7 @@ export class VehicleMaanager {
 
     move(tileWithVehicle: Tile): Tile {
         const vehicle = tileWithVehicle.vehicle;
-        const SPEED = .17;
+        const SPEED = -.17;
         console.log(vehicle.placement);
 
         vehicle.placement.lambda += SPEED;
@@ -79,6 +79,7 @@ export class VehicleMaanager {
         if (vehicle.placement.lambda < 0) {
             return this.step(tileWithVehicle, false);
         }
+        this.layer.update(tileWithVehicle);
         return tileWithVehicle;
     }
 
