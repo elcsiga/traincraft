@@ -37,31 +37,60 @@ export class VehicleMaanager {
         });
     }
 
-    getNextPlacement(placement: VehiclePlacement): PlacementWithTile {
-        const position = shift(placement.position, placement.toDir);
+    getNextPlacement(placement: VehiclePlacement, forward: boolean): PlacementWithTile {
+
+        const shiftDir = forward ? placement.toDir : placement.fromDir;
+        const lambda = placement.lambda;
+        const position = shift(placement.position, shiftDir);
         const tile = this.map.getSafeTile(position);
         if (tile) {
-            const fromDir = opposite(placement.toDir);
-            const normalizedFromDir = normalize(fromDir + tile.structure.rotation);
+            const shiftFromDir = opposite(shiftDir);
+            const normalizedShiftFromDir = normalize(shiftFromDir + tile.structure.rotation);
 
-            const normalizedToDir = structureTypes[tile.structure.index].next(normalizedFromDir);
-            if (normalizedToDir !== null) {
-                const toDir = normalize(normalizedToDir - tile.structure.rotation);
-                const placement: VehiclePlacement = { position, toDir, fromDir };
+            const normalizedShiftToDir = structureTypes[tile.structure.index].next(normalizedShiftFromDir);
+            if (normalizedShiftToDir !== null) {
+                const newShiftDir = normalize(normalizedShiftToDir - tile.structure.rotation);
+                const placement: VehiclePlacement = forward ? {
+                    position,
+                    toDir: newShiftDir,
+                    fromDir: shiftFromDir,
+                    lambda: lambda - 1
+                } : {
+                    position,
+                    toDir: shiftFromDir,
+                    fromDir: newShiftDir,
+                    lambda: lambda + 1
+                };
                 return { placement, tile };
             }
         }
         return null;
     }
 
-    step(tilesWithVehicle: Tile): Tile {
-        const nextPlacementWithTile = this.getNextPlacement(tilesWithVehicle.vehicle.placement);
+    move(tileWithVehicle: Tile): Tile {
+        const vehicle = tileWithVehicle.vehicle;
+        const SPEED = .17;
+        console.log(vehicle.placement);
+
+        vehicle.placement.lambda += SPEED;
+        if (vehicle.placement.lambda > 1) {
+            return this.step(tileWithVehicle, true);
+        }
+        if (vehicle.placement.lambda < 0) {
+            return this.step(tileWithVehicle, false);
+        }
+        return tileWithVehicle;
+    }
+
+
+    step(tileWithVehicle: Tile, forward: boolean): Tile {
+        const vehicle = tileWithVehicle.vehicle;
+        const nextPlacementWithTile = this.getNextPlacement(tileWithVehicle.vehicle.placement, forward);
         if (nextPlacementWithTile && !nextPlacementWithTile.tile.vehicle) {
             const nextTile = nextPlacementWithTile.tile;
-            const vehicle = tilesWithVehicle.vehicle;
 
-            this.layer.exit(tilesWithVehicle);
-            delete tilesWithVehicle.vehicle;
+            this.layer.exit(tileWithVehicle);
+            delete tileWithVehicle.vehicle;
 
             vehicle.placement = nextPlacementWithTile.placement;
 
@@ -74,7 +103,7 @@ export class VehicleMaanager {
 
     stepAll(): void {
         this.tilesWithVehicles.forEach((v, i) => {
-            const newTile = this.step(v);
+            const newTile = this.move(v);
             if (newTile) {
                 this.tilesWithVehicles[i] = newTile;
             }

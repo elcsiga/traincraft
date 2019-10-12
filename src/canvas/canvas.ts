@@ -36,7 +36,7 @@ export class Canvas {
     public keysPressed = new Set();
 
     private viewOffset: ScreenCoord = { sx: 0, sy: 0 };
-    private zoom = 1;
+    private zoom = .7;
 
     private renderPhase: RnderPhase = 1;
     private previousMapArea: MapArea = null;

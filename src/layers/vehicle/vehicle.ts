@@ -22,6 +22,7 @@ export interface VehiclePlacement {
     position: MapCoord;
     toDir: HexDir;
     fromDir: HexDir;
+    lambda: number;
 }
 
 export function getVehicleTransform(placement: VehiclePlacement): string {

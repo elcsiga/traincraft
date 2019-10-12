@@ -1,8 +1,8 @@
 import { PerspectiveCamera, Scene, BoxGeometry, MeshNormalMaterial, Mesh, WebGLRenderer } from 'three';
 
-import * as styles from './canvas3D.scss';
+import * as styles from './ThreeRenderer.scss';
 
-export class Canvas3D {
+export class ThreeRenderer {
     private containerElement: HTMLElement;
 
     private camera: PerspectiveCamera;
