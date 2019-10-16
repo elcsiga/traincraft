@@ -31,7 +31,7 @@ export class StructureLayer extends Layer {
             img.classList.add(styles.tile);
 
             tile.canvas._structureElement = img;
-            tile.canvas.containerElement.appendChild(img);
+            (tile.canvas.containerElement as HTMLElement).appendChild(img);
 
             this.update(tile);
         }

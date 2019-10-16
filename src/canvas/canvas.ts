@@ -4,10 +4,12 @@ import { TileMap } from '../hex/tileMap';
 import { UiState } from '../ui-states/shared';
 import { Layer } from '../layers/layer';
 import { DOMRenderer } from './DOMRenderer/DOMRenderer';
+import { Object3D } from 'three';
+import { Renderer } from './Renderer';
 
 export interface VisibleTile {
     canvas?: {
-        containerElement: HTMLElement;
+        containerElement: HTMLElement | Object3D;
         renderPhase: RnderPhase;
     };
 }
@@ -19,7 +21,6 @@ export interface ScreenCoord {
 export type RnderPhase = 1 | 2;
 
 export class Canvas {
-    private renderer = new DOMRenderer(this);
     private containerElement: HTMLElement;
 
     rect: {
@@ -43,10 +44,15 @@ export class Canvas {
 
     private lastMousePos: ScreenCoord = null;
 
-    constructor(private map: TileMap<VisibleTile>, private layers: Layer[]) {
+    constructor(
+        private renderer: Renderer,
+        private map: TileMap<VisibleTile>,
+        private layers: Layer[]
+    ) {
+        this.renderer.init(this);
         this.containerElement = document.createElement('div');
         this.containerElement.classList.add(styles.container);
-        this.containerElement.appendChild(this.renderer.canvasElement);
+        this.containerElement.appendChild(this.renderer.getContainerElement());
 
         this.eventHandlers.forEach(e => this.containerElement.addEventListener(e.key, e.handler));
         window.addEventListener('resize', this.handleResize);
@@ -307,11 +313,9 @@ export class Canvas {
     }
 
     enter(tile: VisibleTile, m: MapCoord): void {
-        const container = this.renderer.createNewTileContainer();
-        tile.canvas = {
-            containerElement: container,
-            renderPhase: this.renderPhase,
-        };
+        const container = this.renderer.createNewTileContainer(
+            tile, this.renderPhase
+        );
 
         this.renderer.setTileTransform(tile, m);
 

@@ -51,7 +51,7 @@ export class EditVehicle extends UiState {
 
     resetHover(): void {
         if (this.cursor) {
-            this.cursor.tile.canvas.containerElement.style.opacity = '1';
+            (this.cursor.tile.canvas.containerElement as HTMLElement).style.opacity = '1';
             this.cursor = null;
         }
     }
@@ -74,7 +74,7 @@ export class EditVehicle extends UiState {
 
             if (placement) {
                 this.cursor = { tile, placement };
-                tile.canvas.containerElement.style.opacity = '.5';
+                (tile.canvas.containerElement as HTMLElement).style.opacity = '.5';
             }
         }
     }

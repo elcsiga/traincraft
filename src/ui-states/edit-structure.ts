@@ -75,8 +75,8 @@ export class EditStructure extends UiState {
                     const overlay1 = newDef1 ? this.getOverlayImage(newDef1) : null;
                     const overlay2 = newDef2 ? this.getOverlayImage(newDef2) : null;
 
-                    if (overlay1) tile1.canvas.containerElement.appendChild(overlay1);
-                    if (overlay2) tile2.canvas.containerElement.appendChild(overlay2);
+                    if (overlay1) (tile1.canvas.containerElement as HTMLElement).appendChild(overlay1);
+                    if (overlay2) (tile2.canvas.containerElement as HTMLElement).appendChild(overlay2);
 
                     this.cursor = { tile1, tile2, dir, overlay1, overlay2 };
                 }

@@ -1,24 +1,37 @@
 import * as styles from './DOMRenderer.scss';
-import { Canvas, VisibleTile, ScreenCoord } from "../canvas";
+import { Canvas, VisibleTile, ScreenCoord, RnderPhase } from "../canvas";
 import { MapCoord, toView, tileWidth, tileHeight } from "../../hex/hexGeo";
 
 export class DOMRenderer {
+    private canvas: Canvas;
     canvasElement: HTMLElement;
 
-    constructor(private canvas: Canvas) {
+    constructor() {
+    }
+
+    init(canvas: Canvas) {
+        this.canvas = canvas;
         this.canvasElement = document.createElement('div');
         this.canvasElement.classList.add(styles.canvas);
+    }
+
+    getContainerElement(): HTMLElement {
+        return this.canvasElement;
     }
 
     updateTransform(offset: ScreenCoord, zoom: number): void {
         this.canvasElement.style.transform = `translate(${offset.sx}px, ${-offset.sy}px) scale(${zoom}, ${zoom})`;
     }
 
-    createNewTileContainer(): HTMLElement {
+    createNewTileContainer(tile: VisibleTile, renderPhase: RnderPhase): void {
         const div = document.createElement('div');
         div.classList.add(styles.tile);
         this.canvasElement.appendChild(div);
-        return div;
+
+        tile.canvas = {
+            containerElement: div,
+            renderPhase: renderPhase,
+        };
     }
 
     removeTileContainer(tile: VisibleTile): void {
@@ -34,7 +47,7 @@ export class DOMRenderer {
 
             const tx = cx + w.wx;
             const ty = cy - w.wy;
-            tile.canvas.containerElement.style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
+            (tile.canvas.containerElement as HTMLElement).style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
         }
     }
 }

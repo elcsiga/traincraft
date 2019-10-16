@@ -1,8 +1,11 @@
 import { PerspectiveCamera, Scene, BoxGeometry, MeshNormalMaterial, Mesh, WebGLRenderer } from 'three';
 
 import * as styles from './ThreeRenderer.scss';
+import { Canvas, ScreenCoord, VisibleTile } from '../canvas';
+import { MapCoord } from '../../hex/hexGeo';
+import { Renderer } from '../Renderer';
 
-export class ThreeRenderer {
+export class ThreeRenderer extends Renderer{
     private containerElement: HTMLElement;
 
     private camera: PerspectiveCamera;
@@ -12,15 +15,42 @@ export class ThreeRenderer {
     private material: MeshNormalMaterial;
     private mesh: Mesh;
 
+    private canvas: Canvas;
+
     constructor() {
+        super();
+
+        // this.init();
+
+    }
+
+    getContainerElement(): HTMLElement {
+        return this.containerElement;
+    }
+
+    init(canvas: Canvas) {
+        this.canvas = canvas;
         this.containerElement = document.createElement('div');
         this.containerElement.classList.add(styles.container);
 
-        this.init();
+        this.setup();
         this.animate();
     }
 
-    init(): void {
+    updateTransform(offset: ScreenCoord, zoom: number): void {
+
+    }
+    createNewTileContainer(): HTMLElement {
+        return null;
+    }
+    removeTileContainer(tile: VisibleTile): void {
+
+    }
+    setTileTransform(tile: VisibleTile, m: MapCoord): void {
+
+    }
+
+    setup(): void {
         this.camera = new PerspectiveCamera(70, 100 / 100, 0.01, 10);
         this.camera.position.z = 1;
 
@@ -33,7 +63,10 @@ export class ThreeRenderer {
         this.scene.add(this.mesh);
 
         this.renderer = new WebGLRenderer({ antialias: true });
-        this.renderer.setSize(100, 100);
+        this.renderer.setSize(
+            this.containerElement.clientWidth,
+            this.containerElement.clientHeight
+            );
         this.containerElement.appendChild(this.renderer.domElement);
     }
 
@@ -48,7 +81,7 @@ export class ThreeRenderer {
         this.containerElement.remove();
     }
 
-    getElement(): HTMLElement {
-        return this.containerElement;
-    }
+
+
+
 }

@@ -15,7 +15,7 @@ export class EditTerrain extends UiState {
 
     resetHover(): void {
         if (this.cursorTile && this.cursorTile.canvas) {
-            this.cursorTile.canvas.containerElement.style.opacity = '1';
+            (this.cursorTile.canvas.containerElement as HTMLElement).style.opacity = '1';
             this.cursorTile = null;
         }
     }
@@ -34,7 +34,7 @@ export class EditTerrain extends UiState {
 
         const tile = this.canvas.getSafeVisibleTile(m) as Tile;
         if (tile && !tile.structure) {
-            tile.canvas.containerElement.style.opacity = '.5';
+            (tile.canvas.containerElement as HTMLElement).style.opacity = '.5';
             this.cursorTile = tile as Tile;
         }
     }

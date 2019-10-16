@@ -41,7 +41,7 @@ export class TerrainLayer extends Layer {
             img.width = tileWidth;
             img.height = tileHeight;
             tile.canvas.terrainElement = img;
-            tile.canvas.containerElement.appendChild(img);
+            (tile.canvas.containerElement as HTMLElement).appendChild(img);
 
             this.update(tile);
         }
