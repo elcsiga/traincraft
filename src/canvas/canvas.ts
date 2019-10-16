@@ -49,7 +49,6 @@ export class Canvas {
         private map: TileMap<VisibleTile>,
         private layers: Layer[]
     ) {
-        this.renderer.init(this);
         this.containerElement = document.createElement('div');
         this.containerElement.classList.add(styles.container);
         this.containerElement.appendChild(this.renderer.getContainerElement());
@@ -61,11 +60,13 @@ export class Canvas {
     }
 
     init(): void {
+        this.renderer.init(this);
         this.updateContainer();
     }
 
     release(): void {
         this.uiState.disable();
+        this.renderer.release();
 
         this.eventHandlers.forEach(e => this.containerElement.removeEventListener(e.key, e.handler));
         window.removeEventListener('resize', this.handleResize);
@@ -217,8 +218,8 @@ export class Canvas {
     ];
 
     private handleResize: () => void = () => {
+        this.renderer.resize();
         this.updateContainer();
-        this.render();
 
         forEachAreaCoord(this.getArea(), m => {
             const tile = this.map.getSafeTile(m);

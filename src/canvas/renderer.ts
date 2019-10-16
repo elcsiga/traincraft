@@ -8,4 +8,8 @@ export abstract class Renderer {
     abstract createNewTileContainer(tile: VisibleTile, renderPhase: RnderPhase): void;
     abstract removeTileContainer(tile: VisibleTile): void;
     abstract setTileTransform(tile: VisibleTile, m: MapCoord): void;
+
+    abstract resize(): void;
+    abstract release(): void;
+
 }

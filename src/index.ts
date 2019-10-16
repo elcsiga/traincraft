@@ -56,6 +56,7 @@ canvasContainerElement.classList.add(styles.demoCanvas);
 canvasContainerElement.appendChild(canvas.getElement());
 
 document.body.appendChild(canvasContainerElement);
+
 canvas.init();
 
 document.addEventListener('keypress', e => {

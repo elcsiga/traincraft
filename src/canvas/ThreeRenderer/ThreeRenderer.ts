@@ -19,9 +19,8 @@ export class ThreeRenderer extends Renderer{
 
     constructor() {
         super();
-
-        // this.init();
-
+        this.containerElement = document.createElement('div');
+        this.containerElement.classList.add(styles.container);
     }
 
     getContainerElement(): HTMLElement {
@@ -30,8 +29,6 @@ export class ThreeRenderer extends Renderer{
 
     init(canvas: Canvas) {
         this.canvas = canvas;
-        this.containerElement = document.createElement('div');
-        this.containerElement.classList.add(styles.container);
 
         this.setup();
         this.animate();
@@ -51,7 +48,10 @@ export class ThreeRenderer extends Renderer{
     }
 
     setup(): void {
-        this.camera = new PerspectiveCamera(70, 100 / 100, 0.01, 10);
+        const width =  this.containerElement.clientWidth;
+        const height = this.containerElement.clientHeight;
+
+        this.camera = new PerspectiveCamera(70, 1, 0.01, 10);
         this.camera.position.z = 1;
 
         this.scene = new Scene();
@@ -63,15 +63,20 @@ export class ThreeRenderer extends Renderer{
         this.scene.add(this.mesh);
 
         this.renderer = new WebGLRenderer({ antialias: true });
-        this.renderer.setSize(
-            this.containerElement.clientWidth,
-            this.containerElement.clientHeight
-            );
+        this.resize();
         this.containerElement.appendChild(this.renderer.domElement);
+    };
+
+    resize(): void {
+        const width =  this.containerElement.clientWidth;
+        const height = this.containerElement.clientHeight;
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize( width, height );
     }
 
-    animate = (): void => {
-        requestAnimationFrame(this.animate);
+    animate(): void {
+        requestAnimationFrame(() => this.animate());
         this.mesh.rotation.x += 0.01;
         this.mesh.rotation.y += 0.02;
         this.renderer.render(this.scene, this.camera);

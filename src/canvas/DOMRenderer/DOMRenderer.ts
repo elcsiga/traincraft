@@ -50,4 +50,12 @@ export class DOMRenderer {
             (tile.canvas.containerElement as HTMLElement).style.transform = `translate(${tx}px, ${ty}px) rotate(0deg)`;
         }
     }
+
+    resize() {
+
+    }
+
+    release() {
+
+    }
 }
