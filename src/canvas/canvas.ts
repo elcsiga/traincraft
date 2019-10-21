@@ -9,8 +9,9 @@ import { Renderer } from './Renderer';
 
 export interface VisibleTile {
     canvas?: {
-        containerElement: HTMLElement | Object3D;
-        renderPhase: RnderPhase;
+        containerElement?: HTMLElement;
+        container?: Object3D;
+        renderPhase: RenderPhase;
     };
 }
 
@@ -18,7 +19,7 @@ export interface ScreenCoord {
     sx: number;
     sy: number;
 }
-export type RnderPhase = 1 | 2;
+export type RenderPhase = 1 | 2;
 
 export class Canvas {
     private containerElement: HTMLElement;
@@ -39,7 +40,7 @@ export class Canvas {
     private viewOffset: ScreenCoord = { sx: 0, sy: 0 };
     private zoom = .7;
 
-    private renderPhase: RnderPhase = 1;
+    private renderPhase: RenderPhase = 1;
     private previousMapArea: MapArea = null;
 
     private lastMousePos: ScreenCoord = null;

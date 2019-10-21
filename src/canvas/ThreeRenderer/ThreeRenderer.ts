@@ -1,19 +1,20 @@
-import { PerspectiveCamera, Scene, BoxGeometry, MeshNormalMaterial, Mesh, WebGLRenderer } from 'three';
+import { PerspectiveCamera, Scene, BoxGeometry, MeshNormalMaterial, Mesh, WebGLRenderer, Object3D } from 'three';
 
 import * as styles from './ThreeRenderer.scss';
-import { Canvas, ScreenCoord, VisibleTile } from '../canvas';
-import { MapCoord } from '../../hex/hexGeo';
+import { Canvas, ScreenCoord, VisibleTile, RenderPhase } from '../canvas';
+import { MapCoord, toView } from '../../hex/hexGeo';
 import { Renderer } from '../Renderer';
 
-export class ThreeRenderer extends Renderer{
+const materials = [
+    
+]
+
+export class ThreeRenderer extends Renderer {
     private containerElement: HTMLElement;
 
     private camera: PerspectiveCamera;
     private scene: Scene;
     private renderer: WebGLRenderer;
-    private geometry: BoxGeometry;
-    private material: MeshNormalMaterial;
-    private mesh: Mesh;
 
     private canvas: Canvas;
 
@@ -37,18 +38,30 @@ export class ThreeRenderer extends Renderer{
     updateTransform(offset: ScreenCoord, zoom: number): void {
 
     }
-    createNewTileContainer(): HTMLElement {
-        return null;
-    }
-    removeTileContainer(tile: VisibleTile): void {
+    createNewTileContainer(tile: VisibleTile, renderPhase: RenderPhase): void {
+        const tilecontainer = new Object3D();
 
+        this.scene.add(tilecontainer);
+        tile.canvas = {
+            container: tilecontainer,
+            renderPhase: renderPhase
+        };
+    }
+
+    removeTileContainer(tile: VisibleTile): void {
+        this.scene.remove(tile.canvas.container);
     }
     setTileTransform(tile: VisibleTile, m: MapCoord): void {
-
+        if (tile.canvas) {
+            const w = toView(m);
+            const p = tile.canvas.container.position;
+            p.x = w.wx / 300; //TODO
+            p.y = w.wy / 300; //TODO
+        }
     }
 
     setup(): void {
-        const width =  this.containerElement.clientWidth;
+        const width = this.containerElement.clientWidth;
         const height = this.containerElement.clientHeight;
 
         this.camera = new PerspectiveCamera(70, 1, 0.01, 10);
@@ -56,11 +69,11 @@ export class ThreeRenderer extends Renderer{
 
         this.scene = new Scene();
 
-        this.geometry = new BoxGeometry(0.2, 0.2, 0.2);
-        this.material = new MeshNormalMaterial();
+        // this.geometry = new BoxGeometry(0.2, 0.2, 0.2);
+        // this.material = new MeshNormalMaterial();
 
-        this.mesh = new Mesh(this.geometry, this.material);
-        this.scene.add(this.mesh);
+        // this.mesh = new Mesh(this.geometry, this.material);
+        // this.scene.add(this.mesh);
 
         this.renderer = new WebGLRenderer({ antialias: true });
         this.resize();
@@ -68,17 +81,17 @@ export class ThreeRenderer extends Renderer{
     };
 
     resize(): void {
-        const width =  this.containerElement.clientWidth;
+        const width = this.containerElement.clientWidth;
         const height = this.containerElement.clientHeight;
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize( width, height );
+        this.renderer.setSize(width, height);
     }
 
     animate(): void {
         requestAnimationFrame(() => this.animate());
-        this.mesh.rotation.x += 0.01;
-        this.mesh.rotation.y += 0.02;
+    //    this.mesh.rotation.x += 0.01;
+    //    this.mesh.rotation.y += 0.02;
         this.renderer.render(this.scene, this.camera);
     };
 

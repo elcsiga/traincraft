@@ -3,7 +3,6 @@ import * as waterTile from './assets/water.png';
 import { tileWidth, tileHeight } from '../../hex/hexGeo';
 import { Layer } from '../layer';
 import { VisibleTile } from '../../canvas/canvas';
-import { Object3D, BoxGeometry, MeshNormalMaterial, Mesh } from 'three';
 
 //////////////////////
 //
@@ -23,7 +22,7 @@ export interface TileWithTerrain {
 }
 export interface VisibleTileWithTerrain {
     canvas: {
-        terrain: Object3D;
+        terrainElement: HTMLImageElement;
     };
 }
 
@@ -38,27 +37,24 @@ export class TerrainLayer extends Layer {
     }
     enter(tile: Tile): void {
         if (tile.terrain && tile.canvas) {
-
-0
-            const geometry = new BoxGeometry(0.2, 0.2, 0.2);
-            const material = new MeshNormalMaterial();
-
-            const mesh = new Mesh(geometry, material);
-            tile.canvas.terrain = mesh;
-            tile.canvas.container.add(mesh);
+            const img = document.createElement('img');
+            img.width = tileWidth;
+            img.height = tileHeight;
+            tile.canvas.terrainElement = img;
+            (tile.canvas.containerElement as HTMLElement).appendChild(img);
 
             this.update(tile);
         }
     }
     update(tile: Tile): void {
         if (tile.terrain && tile.canvas) {
-            //tile.canvas.terrain
+            tile.canvas.terrainElement.src = this.getBackgroundImage(tile);
         }
     }
     exit(tile: Tile): void {
         if (tile.terrain && tile.canvas) {
-            tile.canvas.container.remove(tile.canvas.terrain);
-            delete tile.canvas.terrain;
+            tile.canvas.terrainElement.remove();
+            delete tile.canvas.terrainElement;
         }
     }
 }

@@ -1,5 +1,5 @@
 import * as styles from './DOMRenderer.scss';
-import { Canvas, VisibleTile, ScreenCoord, RnderPhase } from "../canvas";
+import { Canvas, VisibleTile, ScreenCoord, RenderPhase } from "../canvas";
 import { MapCoord, toView, tileWidth, tileHeight } from "../../hex/hexGeo";
 
 export class DOMRenderer {
@@ -23,7 +23,7 @@ export class DOMRenderer {
         this.canvasElement.style.transform = `translate(${offset.sx}px, ${-offset.sy}px) scale(${zoom}, ${zoom})`;
     }
 
-    createNewTileContainer(tile: VisibleTile, renderPhase: RnderPhase): void {
+    createNewTileContainer(tile: VisibleTile, renderPhase: RenderPhase): void {
         const div = document.createElement('div');
         div.classList.add(styles.tile);
         this.canvasElement.appendChild(div);
