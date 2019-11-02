@@ -29,9 +29,9 @@ export function getVehicleTransform(placement: VehiclePlacement): string {
     const f = opposite(placement.fromDir) * 60;
     const t = placement.toDir * 60;
 
-    const a = f * (1-placement.lambda) + t * placement.lambda;
+    const a = f * (1 - placement.lambda) + t * placement.lambda;
     const r = Math.abs(f - t) < 180 ? `rotate(${-a}deg)` : `rotate(${180 - a}deg)`;
-    const mov = ` translateX(${tileWidth * ( placement.lambda - .5 )}px)`;
+    const mov = ` translateX(${tileWidth * (placement.lambda - 0.5)}px)`;
     return r + mov;
 }
 

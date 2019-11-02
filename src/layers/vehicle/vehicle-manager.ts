@@ -38,7 +38,6 @@ export class VehicleMaanager {
     }
 
     getNextPlacement(placement: VehiclePlacement, forward: boolean): PlacementWithTile {
-
         const shiftDir = forward ? placement.toDir : placement.fromDir;
         const lambda = placement.lambda;
         const position = shift(placement.position, shiftDir);
@@ -50,17 +49,19 @@ export class VehicleMaanager {
             const normalizedShiftToDir = structureTypes[tile.structure.index].next(normalizedShiftFromDir);
             if (normalizedShiftToDir !== null) {
                 const newShiftDir = normalize(normalizedShiftToDir - tile.structure.rotation);
-                const placement: VehiclePlacement = forward ? {
-                    position,
-                    toDir: newShiftDir,
-                    fromDir: shiftFromDir,
-                    lambda: lambda - 1
-                } : {
-                    position,
-                    toDir: shiftFromDir,
-                    fromDir: newShiftDir,
-                    lambda: lambda + 1
-                };
+                const placement: VehiclePlacement = forward
+                    ? {
+                          position,
+                          toDir: newShiftDir,
+                          fromDir: shiftFromDir,
+                          lambda: lambda - 1,
+                      }
+                    : {
+                          position,
+                          toDir: shiftFromDir,
+                          fromDir: newShiftDir,
+                          lambda: lambda + 1,
+                      };
                 return { placement, tile };
             }
         }
@@ -69,7 +70,7 @@ export class VehicleMaanager {
 
     move(tileWithVehicle: Tile): Tile {
         const vehicle = tileWithVehicle.vehicle;
-        const SPEED = -.17;
+        const SPEED = -0.17;
         console.log(vehicle.placement);
 
         vehicle.placement.lambda += SPEED;
@@ -82,7 +83,6 @@ export class VehicleMaanager {
         this.layer.update(tileWithVehicle);
         return tileWithVehicle;
     }
-
 
     step(tileWithVehicle: Tile, forward: boolean): Tile {
         const vehicle = tileWithVehicle.vehicle;

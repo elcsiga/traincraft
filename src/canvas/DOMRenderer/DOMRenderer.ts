@@ -1,6 +1,6 @@
 import * as styles from './DOMRenderer.scss';
 import { Canvas, VisibleTile, ScreenCoord, RenderPhase } from "../canvas";
-import { MapCoord, toView, tileWidth, tileHeight } from "../../hex/hexGeo";
+import { MapCoord, toView, tileWidth, tileHeight } from '../../hex/hexGeo';
 
 export class DOMRenderer {
     private canvas: Canvas;

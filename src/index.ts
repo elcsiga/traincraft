@@ -74,8 +74,8 @@ document.addEventListener('keypress', e => {
 
 ///
 
-// const canvas3D = new ThreeRenderer();
-// const canvas3DContainerElement = document.createElement('div');
-// canvas3DContainerElement.classList.add(styles.canvas3D);
-// canvas3DContainerElement.appendChild(canvas3D.getElement());
-// document.body.appendChild(canvas3DContainerElement);
+const canvas3D = new ThreeRenderer();
+const canvas3DContainerElement = document.createElement('div');
+canvas3DContainerElement.classList.add(styles.canvas3D);
+canvas3DContainerElement.appendChild(canvas3D.getElement());
+document.body.appendChild(canvas3DContainerElement);

@@ -19,15 +19,12 @@ export function getInitialVehiclePlacement(position: MapCoord, tile: Tile, conne
         const connections = toConnections(tile.structure);
         const fromDir: HexDir = connections.indexOf(connection);
 
-        if (fromDir < 0)
-            return null; // no connections
+        if (fromDir < 0) return null; // no connections
 
         const toDir: HexDir = connections.indexOf(connection, fromDir + 1);
-        if (toDir < 0)
-            return null; // less than 2 connections
+        if (toDir < 0) return null; // less than 2 connections
 
-        if (connections.indexOf(connection, toDir + 1) >= 0)
-            return null; // more than 2 connections
+        if (connections.indexOf(connection, toDir + 1) >= 0) return null; // more than 2 connections
         const lambda = 0.5;
         return { position, fromDir, toDir, lambda };
     }
